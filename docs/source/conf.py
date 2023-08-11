@@ -25,10 +25,6 @@ import os
 from datetime import datetime
 import learn_aws as package
 
-# package_name = "learn_aws"
-# package_author = "Sanhe Hu"
-# package_version = "0.1.1"
-
 package_name = package.__name__
 package_author = package.__author__
 package_version = package.__version__
@@ -68,7 +64,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The master toctree document.
-master_doc = 'README'
+master_doc = 'index'
 
 # General information about the project.
 project = package_name
