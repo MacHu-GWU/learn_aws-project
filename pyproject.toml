@@ -4,7 +4,7 @@
 [tool.poetry]
 name = "learn_aws"
 version = "0.1.1"
-description = "A sample AWS Lambda Python project with production ready set up"
+description = "AWS Knowledge from My AWS Career since 2011."
 authors = ["Sanhe Hu <husanhe@gmail.com>"]
 
 # --- core dependencies for deployment
