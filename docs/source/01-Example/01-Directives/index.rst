@@ -1,5 +1,6 @@
 Directives
 ==============================================================================
+This document shows all the directives available in the theme.
 
 
 Admonition

@@ -180,9 +180,9 @@ decorator==5.1.1 ; python_full_version >= "3.10.0" and python_full_version < "3.
 defusedxml==0.7.1 ; python_full_version >= "3.10.0" and python_full_version < "3.11.0" \
     --hash=sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69 \
     --hash=sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61
-docfly==1.1.1 ; python_full_version >= "3.10.0" and python_full_version < "3.11.0" \
-    --hash=sha256:540f0ef8728192b96ac3589aac348dc8e0d79abc7d4af88ca581e239aa6aac94 \
-    --hash=sha256:6dd993d308410016306cdb92c1815a4299de34bd4147c65ce708c7b8c073c700
+docfly==2.0.1 ; python_full_version >= "3.10.0" and python_full_version < "3.11.0" \
+    --hash=sha256:4d8eedded3a7b1c33c30443be5a6ff844b1fc1e234deff07f03c7e41353a5b7c \
+    --hash=sha256:ea74ebd206c964246ea7199a8809e9901885cfa7d59f33b8e10322b76086f124
 docutils==0.19 ; python_full_version >= "3.10.0" and python_full_version < "3.11.0" \
     --hash=sha256:33995a6753c30b7f577febfc2c50411fec6aac7f7ffeb7c4cfe5991072dcf9e6 \
     --hash=sha256:5e1de4d849fee02c63b040a4a3fd567f4ab104defd8a5511fbbc24a8a017efbc
