@@ -50,6 +50,7 @@ extensions = [
     'sphinx_jinja',
     'sphinx_copybutton',
     'sphinx_design',
+    'sphinx_search.extension',
     'docfly.directives',
     'nbsphinx',
 ]
