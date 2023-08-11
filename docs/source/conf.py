@@ -23,11 +23,15 @@
 from __future__ import unicode_literals
 import os
 from datetime import datetime
-# import learn_aws as package
+import learn_aws as package
 
-package_name = "learn_aws"
-package_author = "Sanhe Hu"
-package_version = "0.1.1"
+# package_name = "learn_aws"
+# package_author = "Sanhe Hu"
+# package_version = "0.1.1"
+
+package_name = package.__name__
+package_author = package.__author__
+package_version = package.__version__
 
 # -- General configuration ------------------------------------------------
 
@@ -233,16 +237,3 @@ jinja_contexts = {
         "doc_data": doc_data,
     },
 }
-
-# Api Reference Doc
-import docfly
-
-docfly.ApiReferenceDoc(
-    conf_file=__file__,
-    package_name=package_name,
-    ignored_package=[
-        "%s._version" % package_name,
-        "%s.docs" % package_name,
-        "%s.tests" % package_name,
-    ]
-).fly()
