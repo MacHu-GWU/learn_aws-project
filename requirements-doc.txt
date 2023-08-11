@@ -442,9 +442,6 @@ pyzmq==25.1.1 ; python_full_version >= "3.10.0" and python_full_version < "3.11.
     --hash=sha256:f32260e556a983bc5c7ed588d04c942c9a8f9c2e99213fec11a031e316874c7e \
     --hash=sha256:f8115e303280ba09f3898194791a153862cbf9eef722ad8f7f741987ee2a97c7 \
     --hash=sha256:fedbdc753827cf014c01dbbee9c3be17e5a208dcd1bf8641ce2cd29580d1f0d4
-readthedocs-sphinx-search==0.3.1 ; python_full_version >= "3.10.0" and python_full_version < "3.11.0" \
-    --hash=sha256:32c1ed5b129691adfb7e40effcecf887c5ebd525a06d96b9df11afb9461c9e33 \
-    --hash=sha256:6ee204bf66a78684f370ac8b0f47eeccffbe507586d0826958365463ab2becbf
 referencing==0.30.2 ; python_full_version >= "3.10.0" and python_full_version < "3.11.0" \
     --hash=sha256:449b6669b6121a9e96a7f9e410b245d471e8d48964c67113ce9afe50c8dd7bdf \
     --hash=sha256:794ad8003c65938edcdbc027f1933215e0d0ccc0291e3ce20a4d87432b59efc0
