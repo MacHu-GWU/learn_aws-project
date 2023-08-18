@@ -12,6 +12,7 @@ dir_afwf_fts_anything = dir_home.joinpath(".alfred-afwf", "afwf_fts_anything")
 dataset = "learnaws"
 path_data = dir_afwf_fts_anything.joinpath(f"{dataset}-data.json")
 path_setting = dir_afwf_fts_anything.joinpath(f"{dataset}-setting.json")
+dir_whoosh_index = dir_afwf_fts_anything.joinpath(f"{dataset}-whoosh_index")
 
 header1 = "=" * 50
 
@@ -19,6 +20,9 @@ header1 = "=" * 50
 def try_to_parse_doc_file(
     path: Path,
 ) -> T.Union[T.Optional[str], T.Optional[T.List[str]]]:
+    """
+    获取每个文档的 title 和 keywords
+    """
     lines = path.read_text().splitlines()
     title = None
     keywords = None
@@ -34,10 +38,6 @@ def try_to_parse_doc_file(
                 if word.strip()
             ]
 
-    # if keywords is not None:
-    #     print(title)
-    #     print(keywords)
-
     return (title, keywords)
 
 
@@ -47,7 +47,9 @@ for path in dir_source.select_file(recursive=True):
     if path.basename == "index.rst":
         title, keywords = try_to_parse_doc_file(path)
         if title is not None:
+            # 创建每篇文档的 URL
             url = f"{domain}{path.change(new_basename=path.fname).relative_to(dir_source)}.html"
+            # 构建最终被 index 的数据
             if keywords is None:
                 search = title
             else:
@@ -83,5 +85,6 @@ settings = {
     "autocomplete_field": "{title}",
 }
 
+dir_whoosh_index.remove_if_exists()
 path_data.write_text(json.dumps(data, indent=4))
 path_setting.write_text(json.dumps(settings, indent=4))
