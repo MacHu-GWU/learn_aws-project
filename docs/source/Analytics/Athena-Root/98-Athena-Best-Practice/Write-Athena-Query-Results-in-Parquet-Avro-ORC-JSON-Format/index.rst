@@ -1,3 +1,5 @@
+.. _aws-athena-write-query-results-in-parquet:
+
 Write Athena Query Results in Parquet, Avro, ORC, JSON formats
 ==============================================================================
 Keywords: AWS, Athena, Parquet, Avro, ORC, JSON, S3
