@@ -1,6 +1,8 @@
-Analytics as a Service App Using Multi Tenant Redshift
+Case Study - Analytics as a Service App Using Multi Tenant Redshift
 ==============================================================================
-Keywords: AWS, Amazon, Redshift
+Keywords: AWS, Amazon, Redshift, Multi Tenant
+
+Tags: :bdg-primary:`Case Study` :bdg-primary:`Big Data` :bdg-primary:`Analytics` :bdg-primary:`Data Warehouse` :bdg-primary:`Redshift`
 
 
 Background

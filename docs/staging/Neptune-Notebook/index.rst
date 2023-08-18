@@ -1,0 +1,1 @@
+- `Use Neptune graph notebooks to get started quickly <https://docs.aws.amazon.com/neptune/latest/userguide/graph-notebooks.html>`_
