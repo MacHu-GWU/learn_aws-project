@@ -1,0 +1,31 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "IamGroup1": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": "CftCustomResourcePocGroup1"
+            }
+        },
+        "IamGroupInfo": {
+            "Type": "Custom::IamGroupInfo",
+            "Properties": {
+                "ServiceToken": "arn:aws:lambda:us-east-1:111122223333:function:cf_handler",
+                "Hello": "World"
+            },
+            "DependsOn": "IamGroup1"
+        },
+        "IamGroup2": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": {
+                    "Fn::GetAtt": [
+                        "IamGroupInfo",
+                        "group_name"
+                    ]
+                }
+            },
+            "DependsOn": "IamGroupInfo"
+        }
+    }
+}
