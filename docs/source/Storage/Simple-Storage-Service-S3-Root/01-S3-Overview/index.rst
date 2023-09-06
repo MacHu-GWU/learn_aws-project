@@ -68,6 +68,29 @@ S3 Knowledge Graph
     - S3 Inventory with Inventory reports: 这是一个自动扫描你的 S3 并生成一个 inventory 报告的功能.
 - Strong consistency: S3 能确保 Strong read-after-write consistency. 也就是说, 你在写入一个 Object 后, 立刻读取这个 Object, 你能读到最新的数据.
 
+
+S3 Pricing
+------------------------------------------------------------------------------
+S3 的收费采用的是按需收费, 你用多少收多少钱, 不会存在浪费. 费用的高低取决于以下几个维度:
+
+- Storage and Request: 按照储存的数据量收费, 根据不同的 Storage Class Tier 费用不同
+- Data transfer: 数据传入传出的多少
+- Management & Insights: 使用的 Management
+- Replication: 如果你开启了跨区域数据复制, 那么会有额外费用
+- Transform & Query: 如果你使用了 AWS Lambda 来对数据进行处理, 那么会有额外费用
+
+S3 有不同的 Storage Class Tier, 例如默认是热数据, 冷数据的化可以收费便宜些, 例如:
+
+- 标准 Tier: 存储贵, 读写便宜
+- 低频 Tier: 存储便宜, 读写贵一点
+- 归档 Tier: 存储非常便宜, 读有延时, 而且贵
+- Intelligent Tiering: 自动调整 Tier, 会自动平衡
+
+Reference:
+
+- `Amazon S3 pricing <https://aws.amazon.com/s3/pricing/>`_: S3 详细价格的官方列表, 这个文档不做具体分析, 只是信息的汇总.
+
+
 What's Next
 ------------------------------------------------------------------------------
 todo
