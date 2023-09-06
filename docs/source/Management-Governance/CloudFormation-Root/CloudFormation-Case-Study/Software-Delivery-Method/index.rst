@@ -1,0 +1,83 @@
+如何在 AWS Marketplace 上卖软件
+==============================================================================
+
+
+什么是 AWS Marketplace
+------------------------------------------------------------------------------
+传统的软件公司卖产品通常需要搞定这些事情:
+
+1. 在媒体上进行广告营销.
+2. 维护自己的用户登录, 订阅, 付费的网站.
+3. 建立销售团队进行软件销售.
+4. 如果软件很复杂, 有可能还需要派工程师上门安装.
+5. 建立对用户的用量进行统计的系统, 以便进行收费.
+6. 用于签署合同, 防范法律风险的系统.
+
+听起来就不简单对吗? 下面我们来看看什么是 AWS Marketplace 是如何解决这些问题的.
+
+AWS Marketplace 是一个 AWS 的平台. 它允许软件公司像在 Amazon.com 上卖生活用品那样, 在 AWS 上卖软件.
+
+1. 至于广告营销, AWS Marketplace 上的用户大部分也是 AWS 用户, 它们会自己在 AWS 上搜索想要的软件, 你的软件就能自动被全世界搜索到. 由于你的产品很可能就是服务于 AWS 用户的, 那么 AWS Marketplace 相当于自动帮你对接了这些潜在用户, 所以你甚至还能省下很多广告营销费用.
+2. 至于用户登录, 订阅, 付费的网站, AWS Marketplace 的用户都有 AWS Account, 并绑定了信用卡, AWS 像他们收费, 然后将钱打给你. 所以你无需维护这些系统. 当然你如果想要做更精细化的管理, 你还是可以自己建一个网站, 然后在 AWS Marketplace 上放一个链接, 让用户跳转到你的网站进行订阅.
+3. 至于销售团队, AWS Marketplace 可以解决一部分信息不对的问题. 例如客户可以自助式的使用软件的 Demo. 如果你需要说服大企业客户购买你的软件, 你可能还是要销售团队的.
+4. 至于需要工程师上门安装复杂的软件的问题, 由于 AWS 云上丰富的 delivery 手段, 包括 CloudFormation, AMI Image, Container Image 等等.
+5. 至于对用户的用量进行统计的系统, AWS Marketplace 提供了一套 API, 你的软件只要不断向 AWS 发送统计数据就可以了. 你不需要开发自己的计费服务器.
+6. 而关于合同, AWS 提供了许多的标准合同, 把各种常见的纠纷场景都做了说明.
+
+这么说仅仅是一个大致的概念, 我们之后用具体例子讲解的时候相信会有更深的理解. 在此之前, 如果你以前没有卖软件的经验, 可能对软件交付相关的一些问题没有概念. 下面我们先来回顾一下软件交付手段发展史, 了解一下传统的软件交付流程. 之后再介绍在 AWS Marketplace 上的交付流程时, 你就能更容易地理解.
+
+
+软件交付手段发展史
+------------------------------------------------------------------------------
+1980 - 2000 桌面电脑时代 (不联网)
+
+早期的软件都是桌面软件, 很多都是不联互联网, 只有公司的. 软件一般都是通过买光盘, 安装, 输入 License 激活的方式进行交互. 用户要跟软件公司购买 License, 而这个 License 一般只能控制过期时间, 以及在不同设备上的安装次数. 这种模式的缺点是用户购买的流程长, 安装麻烦. 由于需要允许用户不联网激活 License, 那么这些验证逻辑必然必须位于软件内部, 这样就很容易被破解, 也无法做到热更新. 对于软件公司来说很难监控用户实际使用软件的频率和一些自定义指标 (例如处理的文件数量, 运行时长等). 例如以前微软的办公套件, Adobe 的 PDF 处理软件, 都是用的这个方式.
+
+2000 - 2010 年代 (前互联网时代)
+
+这个时代的软件一般都联网了, 所以很多流程都可以被大大简化. 例如跟软件公司购买 License 可以在软件公司的官网上进行了. 安装软件也不需要光盘, 可以直接下载了. 而 License 的验证也可以通过专用的 auth_server 进行. 并且还能通过网络定期给软件打补丁, 更新, 通过网络发送统计数据等等.
+
+2010 后 (前云时代)
+
+2010 年后公有云开始发力, 大部分的软件从需要安装下载, 都变为了 SAAS (软件即服务). 用户无需进行一次性付费, 而是通过订阅进行使用. 例如微软的 Office 变成了网络版, 有浏览器就能用. ToB 的明星产品例如 Salesforce CRM, Snowflake 数据仓库, GitHub 代码仓库和 CI/CD 等等都变成了 SAAS 应用. 而 AWS 作为公有云厂商的领头羊, 更是增长迅速, 把传统软件开发和部署的蛋糕都纳入囊中.
+
+
+
+
+- SAAS (软件即服务): 比较新的软件像 GitHub, Snowflake 都是 SAAS 的服务, 用户注册账号, 绑定信用卡购买 Subscription, 就可以开始在网页界面使用了, 还能用 API 来进行操作. 用户无需自己部署任何东西.
+- License (需要激活): 比较传统的软件例如各种安全软件, 备份软件 都是需要购买 License 的. 用户提前购买了 License, 这个 License 一般允许用户在几年内安装最多 N 台机器. 用户通常需要在自己的服务器上进行下载安装, 然后输入 License Key 进行激活.
+
+
+Product delivery methods
+------------------------------------------------------------------------------
+- Amazon Machine Image (AMI)
+- AMI delivered using AWS CloudFormation templates
+- Private image build
+- Container-based product or application
+- Data products
+- Machine learning algorithms and model packages
+- Software as a service (SaaS)
+- Professional services
+
+- Annual pricing
+- Usage pricing
+- Contract pricing
+- Bring Your Own License pricing
+
+Reference:
+
+- `Product delivery on AWS Marketplace <https://docs.aws.amazon.com/marketplace/latest/userguide/product-preparation.html#product-delivery>`_
+s3://edfre-euwest1-sbx-rdl-kpi-data/concept_data_collection/event_data/project_mrid=0fcab825-a778-11ea-a696-02c065a7aa34/concept_id=INVERTER_GAPC/year=2023/month=04
+s3://edfre-euwest1-sbx-rdl-kpi-data/concept_data_collection/event_data/project_mrid=0fcab825-a778-11ea-a696-02c065a7aa34/concept_id=INVERTER_GAPC/year=2023/month=04
+
+纯 SAAS 服务产品交付的架构
+------------------------------------------------------------------------------
+- 用户在你的网站上注册, 绑定信用卡付费.
+- 用户无需自己部署任何东西, 而是
+
+
+
+需要 License 的产品后台
+------------------------------------------------------------------------------
+- 需要一个网站来让用户注册账号, 绑定信用卡, 购买 License.
+- 需要一个 License 服务器能验证 License 的有效性.
