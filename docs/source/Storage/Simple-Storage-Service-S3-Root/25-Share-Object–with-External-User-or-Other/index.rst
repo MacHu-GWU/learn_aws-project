@@ -18,6 +18,10 @@ Keywords: AWS, Amazon, S3
 
 给用户配置 IAM Role (通常是 cross account) 允许访问该 Bucket, 同时给 Bucket 添加 bucket policy, 显式允许前面指定的 IAM Role 访问. 这样的弊端是如果用户数量非常多 (几千个), 就不容易配置了.
 
+方法 2: Amazon S3 access points
+
+可以创建一个专用的 Endpoint (具有公网 IP 和 URL 的网络设备) 来将你的 S3 中的 Object 共享给受信用户. 你可以在 Access Point 中定义受信用户的 VPC 或 IP 网段. 该功能本质上是为了解决共享 S3 Bucket 的时候通常要修改 Bucket Policy, 而 Bucket Policy 有 20KB 大小的限制问题. 而你可以创建多达 10,000 个 Access Point, 如果你申请增加 Quota, 你可以创建更多 Access Point.
+
 **情况 3: 你负责存储, 允许你的用户读数据**
 
 这种情况常见于你是 Data vendor 的情况, 这时一般会使用 requeter pay 的 bucket, 也就是谁用谁付钱. 你还可以用 AWS Marketplace Data Exchange 来发布和卖你的数据.
