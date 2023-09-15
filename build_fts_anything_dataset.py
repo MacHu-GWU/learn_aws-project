@@ -4,6 +4,8 @@ import typing as T
 import json
 from pathlib_mate import Path
 
+print("build learnaws full text search anything dataset ...")
+
 dir_here = Path.dir_here(__file__)
 dir_source = dir_here.joinpath("docs", "source")
 
@@ -88,3 +90,5 @@ settings = {
 dir_whoosh_index.remove_if_exists()
 path_data.write_text(json.dumps(data, indent=4))
 path_setting.write_text(json.dumps(settings, indent=4))
+
+print(f"done! check '{path_data}' and '{path_setting}' file")
