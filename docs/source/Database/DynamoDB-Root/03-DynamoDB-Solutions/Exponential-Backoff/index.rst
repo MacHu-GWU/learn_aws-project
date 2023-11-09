@@ -1,4 +1,4 @@
-Exponential Backoff
+Dynamodb Solution - Exponential Backoff
 ==============================================================================
 `Exponential Backoff <https://en.wikipedia.org/wiki/Exponential_backoff>`_ 是一个反馈系统中的算法. 说的是一个系统有 Event 可以触发 Response 的, 如果连续进来许多个相同 Event, 我们不希望为所有的 Event 都返回 Response, 这样会占用大量系统资源. 而是使用 指数轮训 的方式, 让每两次返回 Response 的间隔越来越长. 举例来说, 前 1 秒内最多返回一个 Response, 1 - 2 秒内最多返回 1 个, 2 - 4 秒内最多返回 1 个, 4 - 8 秒内最多返回 1 个, 依次按 2 的倍数递增, 然后超过 3600 秒则刷新整个过程. 这里只是一个例子, 其中的间隔, 倍数, 刷新时间都可以自定义.
 

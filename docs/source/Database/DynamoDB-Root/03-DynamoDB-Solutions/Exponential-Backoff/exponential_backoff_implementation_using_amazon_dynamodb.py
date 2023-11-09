@@ -59,15 +59,13 @@ class Tracker(pm.Model):
         region = "us-east-1"
         billing_mode = pm.PAY_PER_REQUEST_BILLING_MODE
 
+    # fmt: off
     pk: T.Union[str, pm.UnicodeAttribute] = pm.UnicodeAttribute(hash_key=True)
     sk: T.Union[str, pm.UnicodeAttribute] = pm.UnicodeAttribute(range_key=True)
     count: T.Union[int, pm.NumberAttribute] = pm.NumberAttribute()
-    first_report_time: T.Union[
-        datetime, pm.UTCDateTimeAttribute
-    ] = pm.UTCDateTimeAttribute()
-    last_report_time: T.Union[
-        datetime, pm.UTCDateTimeAttribute
-    ] = pm.UTCDateTimeAttribute()
+    first_report_time: T.Union[datetime, pm.UTCDateTimeAttribute] = pm.UTCDateTimeAttribute()
+    last_report_time: T.Union[datetime, pm.UTCDateTimeAttribute] = pm.UTCDateTimeAttribute()
+    # fmt: on
 
     @property
     def principal_id(self) -> str:
