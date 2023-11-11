@@ -77,3 +77,34 @@ AWS CloudWatch 是 AWS 旗下的一款围绕着日志来构建的存储, 分析,
 - NewRelic
 - Dynatrace
 - Splunk
+
+
+How does AWS CloudWatch Work
+------------------------------------------------------------------------------
+AWS CloudWatch (CW) 是 AWS 云原生的监控系统. 它的特点是无运维, 无需配置, 无需维护. 你只需要把数据打到 AWS CloudWatch, 然后就可以在 AWS CloudWatch 上看到数据, 对数据进行查询, 并且可以针对特定的事件 Alarm, 以及做 Dashboard.
+
+CW 由于以下几个组件组成:
+
+1. 基础设施:
+    - `Log Group 和 Log Stream <https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html>`_. Log Stream 是来自于同一个数据源 (可以是物理意义上的也可以是逻辑意义上的) 的时间序列日志. 而 Log Group 则是一组 retention, monitoring, access control settings 都一样的 Log Stream. 你只需要将 Log 用 API 打到 Log Stream 即可. 它们的本质就是支持查询的一个 Log 存储系统. 你要是需要, 也可以将其中的数据导出到其他系统, 例如 Redshift, ElasticSearch 中. 这就相当于你自己维护了一个 ElasticSearch 集群, 并且自己为 Log 日志创建了 Index 等一系列分库分表等策略. 又或者是你创建了一个 InfluxDB 时间序列数据库用来存储日志数据. 而在 CloudWatch 中你什么都不用做.
+2. 核心组件:
+    - `CloudWatch log insight <https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html>`_ 是一个允许用户用查询语法对 Log 进行分析的工具, 类似于 ElasticSearch 的查询语言, 不过你无需维护任何基础设施.
+    - `Metrics <https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Metric>`_ 则是一组跟业务相关的指标的时间序列. 例如每分钟的 App 平均响应时间. Metrics 通常是通过对 Log 进行筛选, 聚合分析之后得到的结果. 而用户可以轻松地自定义分析的逻辑. 这就相当于是你自己部署了一个应用, 每隔几秒钟就 Run 一次分析, 并刷新结果. 只不过你完全无需维护任何基础设施, 也不需要部署任何东西.
+    - `Alarm <https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#CloudWatchAlarms>`_ 则是 Metrics 数值满足某一条件的特殊事件. 例如你的 App 每分钟的平均响应时间在 1 小时内连续超过了 1 秒, 这就可以是一个 Alarm. 它就相当于是你自己部署了一个应用, 每隔几秒就检查一次 Metrics, 看看是否满足某种条件. 如果满足, 则发送 Notification. 只不过你完全无需维护任何基础设施, 也不需要部署任何东西. Alarm 可以通过 SNS Topic 或是 Event Bridge 跟其他系统进行集成.
+3. 应用层:
+    - `Dashboard <https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html>`_ 则是一个可自定义的面板. 它支持 10 多种常用的图表, 例如折线图, 柱状图, 饼图等等. 这些图表本质上是将 Metrics 中的数据显示出来. 而且它还允许你用 Lambda Function + 自定义的 JavaScript 来构建任何你想要的图表, 显示你想要的数据. 它就相当于你购买了 Tableau 等类似的面板软件, 而你什么也不用部署, 直接用即可.
+
+这一套下来, 你就拥有了一个完整的云原生监控系统. 相比传统的 ElasticSearch + LogStash + Kibana 或者自己构建一套 Kafka + 容器的流数据处理系统, 自己架设一套数据库, 维护 ElasticSearch 集群以支持日志分析, 购买可视化图表软件例如 Tableau, 最后还要维护这套系统的扩容和健康, 你几乎什么都不用维护, 只要专注于你的业务就可以了. 虽然市场上的这些专业工具都很强大, 但是 AWS 这套系统能解决市场上 90% 的需求, 并且从想法到落地的速度要比分别购买这些组件并将他们集成起来要快一个数量级. 这套方案既可以助力小团队, 也可以支撑起一个大型企业的需求.
+
+
+CloudWatch Knowledge Graph
+------------------------------------------------------------------------------
+以下是 CloudWatch 的知识图谱, 对所有的知识点进行了一个梳理.
+
+- Manage Log Group and Stream:
+    - Log Group: 创建, 并配置 Retention, KMS Encryption
+    - Log Stream: 创建 Stream
+    - 如何将你的团队, 你的项目, 你的应用, 你部署的计算单元与 Group 和 Stream 一一对应起来.
+- Log Insight:
+    - 如何用 Log Insight 对 Log 进行查询, 分析.
+    - 
