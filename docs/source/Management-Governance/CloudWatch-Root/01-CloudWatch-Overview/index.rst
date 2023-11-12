@@ -105,6 +105,18 @@ CloudWatch Knowledge Graph
     - Log Group: 创建, 并配置 Retention, KMS Encryption
     - Log Stream: 创建 Stream
     - 如何将你的团队, 你的项目, 你的应用, 你部署的计算单元与 Group 和 Stream 一一对应起来.
-- Log Insight:
+- CloudWatch Logs Insights:
     - 如何用 Log Insight 对 Log 进行查询, 分析.
-    - 
+    - Log Insight 的查询语言
+- Metrics
+    - 如何从自带的 Log Group (例如 Lambda) 中创建 Metrics
+    - 如何使用 Metrics Filter 创建自定义 Metrics
+- Alarm
+    - 如何创建 Alarm
+    - 如何对 Alarm 的事件进行相应
+- Dashboard
+    - 如何创建 Dashboard
+    - 如何管理 Dashboard 的权限
+    - 如何分享 Dashboard
+- Advanced
+    - 如何跨区域, 跨 Account 来分享 CloudWatch 的数据, 从而创建一个 Centralized dashboard.
