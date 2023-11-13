@@ -5,9 +5,6 @@ import time
 import random
 import dataclasses
 
-from boto_session_manager import BotoSesManager
-from aws_console_url.api import AWSConsole
-
 from recipe import (
     create_log_group,
     delete_log_group,
@@ -16,23 +13,16 @@ from recipe import (
     BaseJsonMessage,
     put_log_events,
 )
-
-bsm = BotoSesManager(profile_name="awshsh_app_dev_us_east_1")
-aws = AWSConsole(aws_account_id=bsm.aws_account_id, aws_region=bsm.aws_region, bsm=bsm)
-log_client = bsm.cloudwatchlogs_client
-
-group_name = "learn_aws_cloudwatch/working_with_log_groups_and_log_streams"
-stream_name_1 = "container-1"
-stream_name_2 = "container-2"
+from shared import bsm, logs_client, aws, group_name, stream_name_1, stream_name_2
 
 
 def set_up():
     """
     Set up cloudwatch logs resource for this example.
     """
-    create_log_group(log_client, group_name)
-    create_log_stream(log_client, group_name, stream_name_1)
-    create_log_stream(log_client, group_name, stream_name_2)
+    create_log_group(logs_client, group_name)
+    create_log_stream(logs_client, group_name, stream_name_1)
+    create_log_stream(logs_client, group_name, stream_name_2)
     print(aws.cloudwatch.get_log_group(group_name))
 
 
@@ -67,7 +57,7 @@ def rand_event() -> T.List[T.Union[ProcessingTimeMessage, StatusMessage]]:
             ),
             ProcessingTimeMessage(
                 server_id=server_id,
-                processing_time=random.randint(100, 1000),
+                processing_time=random.randint(1000, 10000),
             ),
         ]
     else:
@@ -110,7 +100,7 @@ def clean_up():
     """
     Clearn up cloudwatch logs resource for this example.
     """
-    delete_log_group(log_client, group_name)
+    delete_log_group(logs_client, group_name)
 
 
 if __name__ == "__main__":

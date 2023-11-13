@@ -17,11 +17,19 @@ Usage:
         Event,
         BaseJsonMessage,
         put_log_events,
+        get_ts_in_second,
+        get_ts_in_millisecond,
+        QueryStatusEnum,
+        wait_logs_insights_query_to_succeed,
+        run_query,
+        reformat_query_results,
     )
 """
 
 import typing as T
+import time
 import json
+import enum
 import dataclasses
 from datetime import datetime, timezone
 
@@ -167,7 +175,9 @@ def get_now_ts() -> int:
     """
     The put log events API expects a timestamp in milliseconds since epoch.
     """
-    return int((datetime.utcnow().replace(tzinfo=timezone.utc) - EPOCH).total_seconds() * 1000)
+    return int(
+        (datetime.utcnow().replace(tzinfo=timezone.utc) - EPOCH).total_seconds() * 1000
+    )
 
 
 @dataclasses.dataclass
@@ -227,3 +237,157 @@ def put_log_events(
         logEvents=[dataclasses.asdict(event) for event in events],
     )
     return res
+
+
+def get_ts(dt: datetime) -> float:
+    """
+    Convert a datetime object to a timestamp in seconds since epoch.
+
+    It assumes the datetime object is in UTC if it doesn't have a timezone.
+    """
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    else:
+        dt = dt.astimezone(timezone.utc)
+    return (dt - EPOCH).total_seconds()
+
+
+def get_ts_in_second(dt: datetime) -> int:
+    """
+    Convert a datetime object to a timestamp in seconds since epoch.
+    """
+    return int(get_ts(dt))
+
+
+def get_ts_in_millisecond(dt: datetime) -> int:
+    """
+    Convert a datetime object to a timestamp in milliseconds since epoch.
+    """
+    return int(get_ts(dt) * 1000)
+
+
+class QueryStatusEnum(str, enum.Enum):
+    """
+    Enum for the query status.
+
+    Ref: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/get_query_results.html
+    """
+
+    Scheduled = "Scheduled"
+    Running = "Running"
+    Complete = "Complete"
+    Failed = "Failed"
+    Cancelled = "Cancelled"
+    Timeout = "Timeout"
+    Unknown = "Unknown"
+
+
+def wait_logs_insights_query_to_succeed(
+    logs_client,
+    query_id: str,
+    delta: int = 1,
+    timeout: int = 30,
+) -> dict:
+    """
+    Wait a given athena query to reach ``Complete`` status. If failed,
+    raise ``RuntimeError`` immediately. If timeout, raise ``TimeoutError``.
+
+    Ref: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/get_query_results.html
+
+    :param logs_client: The boto3 cloudwatch logs client.
+    :param query_id: The query id from the response of ``start_query`` API call.
+    :param delta: The time interval in seconds between each query status check.
+    :param timeout: The maximum time in seconds to wait for the query to succeed.
+    """
+    elapsed = 0
+    for _ in range(999999):
+        res = logs_client.get_query_results(queryId=query_id)
+        status = res["status"]
+        if status == QueryStatusEnum.Complete.value:
+            return res
+        elif status in [
+            QueryStatusEnum.Failed.value,
+            QueryStatusEnum.Cancelled.value,
+            QueryStatusEnum.Timeout.value,
+        ]:
+            raise RuntimeError(f"query {query_id} reached status: {status}")
+        else:
+            time.sleep(delta)
+        elapsed += delta
+        if elapsed > timeout:
+            raise TimeoutError(f"logs insights query timeout in {timeout} seconds!")
+
+
+def strip_out_limit_clause(query: str) -> str:
+    """
+    Strip out the limit clause from a query string.
+    """
+    lines = query.splitlines()
+    return "\n".join([line for line in lines if not line.startswith("| limit")])
+
+
+def run_query(
+    logs_client,
+    start_datetime: datetime,
+    end_datetime: datetime,
+    query: str,
+    log_group_name: T.Optional[str] = None,
+    log_group_name_list: T.Optional[T.List[str]] = None,
+    log_group_id_list: T.Optional[T.List[str]] = None,
+    limit: int = 1000,
+    delta: int = 1,
+    timeout: int = 30,
+) -> T.Tuple[str, dict]:
+    """
+    Run a logs insights query and wait for the query to succeed. It is a more
+    human friendly wrapper of the ``start_query`` and ``get_query_results`` API.
+
+    Ref: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/start_query.html
+
+    :param logs_client: The boto3 cloudwatch logs client.
+    :param start_datetime: python datetime object for start time,
+        if timezone is not set, it assumes UTC.
+    :param end_datetime: python datetime object for end time,
+        if timezone is not set, it assumes UTC.
+    :param query: The query string. don't use ``| limit abc`` in your query,
+        use the ``limit`` parameter instead.
+    :param log_group_name: see ``start_query`` API.
+    :param log_group_name_list: see ``start_query`` API.
+    :param log_group_id_list: see ``start_query`` API.
+    :param limit: see ``start_query`` API.
+    :param delta: The time interval in seconds between each query status check.
+    :param timeout: The maximum time in seconds to wait for the query to succeed.
+    """
+    start_ts = get_ts_in_second(start_datetime)
+    end_ts = get_ts_in_second(end_datetime)
+    kwargs = dict(
+        startTime=start_ts,
+        endTime=end_ts,
+        queryString=query,
+        limit=limit,
+    )
+    if log_group_name is not None:
+        kwargs["logGroupName"] = log_group_name
+    elif log_group_name_list:
+        kwargs["logGroupNames"] = log_group_name_list
+    elif log_group_id_list:
+        kwargs["logGroupIds"] = log_group_id_list
+    else:  # it will raise error in API call
+        pass
+    res = logs_client.start_query(**kwargs)
+    query_id = res["queryId"]
+    res = wait_logs_insights_query_to_succeed(logs_client, query_id, delta, timeout)
+    return query_id, res
+
+
+def reformat_query_results(response: dict) -> T.List[dict]:
+    """
+    Convert the response from ``get_query_results`` API call to a more Pythonic
+    format.
+
+    :param response: the response from ``get_query_results`` API call.
+    """
+    return [
+        {dct["field"]: dct["value"] for dct in result}
+        for result in response.get("results", [])
+    ]
