@@ -24,3 +24,37 @@ Reference:
 IAM Knowledge Graph
 ------------------------------------------------------------------------------
 以下是 IAM 的知识图谱, 对所有的知识点进行了一个梳理.
+
+- Concepts: 这里列出了所有重要的概念, 在理解它们之前建议不要深入阅读其他内容.
+    - Terms
+        - IAM Resource
+            - user
+            - group
+            - role
+            - policy
+            - identity-provider object
+        - IAM Entity
+            - user
+            - role
+        - IAM Identity
+        - Principals
+        - Human users
+        - Workload
+    - Principal
+    - Request
+        - Actions or operations
+        - Resources – The AWS resource object upon which the actions or operations are performed.
+        - Principal
+        - Environment data
+        - Resource data
+    - Authentication
+    - Authorization
+    - Actions or operations
+    - Resources
+- Security best practices and use cases: AWS 自己总结的关于 IAM 的最佳实践和使用场景.
+    - Security best practices
+    - Root user best practices
+    - Business use cases
+- IAM Identities: 深入了解如何配置和管理 IAM Identifies, User, Group, Role, Policy.
+- Access management for AWS resources: 深入了解如何管理 AWS 资源的访问权限.
+- IAM Access Analyzer: 这是一个比较新的服务, 能自动扫描你的 IAM 配置, 发现潜在的安全风险.
