@@ -222,6 +222,8 @@ def put_log_events(
     """
     Put a list of events into a log stream.
 
+    Ref: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs/client/put_log_events.html
+
     :param logs_client: The boto3 logs client.
     :param group_name: The log group name.
     :param stream_name: The log stream name.

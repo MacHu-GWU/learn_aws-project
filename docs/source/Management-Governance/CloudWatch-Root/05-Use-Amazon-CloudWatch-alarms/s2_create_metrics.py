@@ -9,7 +9,7 @@ from shared import logs_client, group_name
 logs_client.put_metric_filter(
     logGroupName=group_name,
     filterName="ProcessingTime",
-    filterPattern="{ $.processing_time >= 0 }",
+    filterPattern="{ $.processing_time = \"*\" }",
     metricTransformations=[
         {
             "metricName": "AverageProcessingTime",
