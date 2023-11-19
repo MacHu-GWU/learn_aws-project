@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
+A simple script to create and configure an OpenSearch serverless collection.
+
+So you can create index, index data, search documents.
+
+Requirements: see ``create_and_configure_collection_requirements.txt``
+
 Reference:
 
 - Using the AWS SDKs to interact with Amazon OpenSearch Serverless: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-sdk.html#serverless-sdk-python
@@ -35,8 +41,9 @@ def create_encryption_policy(
     """
     try:
         response = oss_client.create_security_policy(
-            description=f"Encryption policy for {collection_name} collection",
             name=f"{collection_name}-policy",
+            description=f"Encryption policy for {collection_name} collection",
+            type="encryption",
             policy=json.dumps(
                 {
                     "Rules": [
@@ -50,7 +57,6 @@ def create_encryption_policy(
                     "AWSOwnedKey": True,
                 }
             ),
-            type="encryption",
         )
         if verbose:
             print("Encryption policy created:")
@@ -77,8 +83,9 @@ def create_network_policy(
     """
     try:
         response = oss_client.create_security_policy(
-            description=f"Network policy for {collection_name} collections",
             name=f"{collection_name}-policy",
+            description=f"Network policy for {collection_name} collections",
+            type="network",
             policy=json.dumps(
                 [
                     {
@@ -101,7 +108,6 @@ def create_network_policy(
                     },
                 ]
             ),
-            type="network",
         )
         if verbose:
             print("Network policy created:")
@@ -128,14 +134,17 @@ def create_access_policy(
     """
     try:
         response = oss_client.create_access_policy(
-            description=f"Data access policy for {collection_name} collections",
             name=f"{collection_name}-policy",
+            description=f"Data access policy for {collection_name} collections",
+            type="data",
             policy=json.dumps(
                 [
                     {
                         "Rules": [
                             {
-                                "Resource": [f"index/{collection_name}/*"],
+                                "Resource": [
+                                    f"index/{collection_name}/*",
+                                ],
                                 "Permission": [
                                     "aoss:CreateIndex",
                                     "aoss:DeleteIndex",
@@ -160,7 +169,6 @@ def create_access_policy(
                     }
                 ]
             ),
-            type="data",
         )
         if verbose:
             print("Access policy created:")
