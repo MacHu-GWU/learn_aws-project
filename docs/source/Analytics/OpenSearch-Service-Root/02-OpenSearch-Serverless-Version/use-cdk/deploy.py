@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+Deploy the OpenSearch serverless collection.
+"""
+
 import os
 import subprocess
 from pathlib import Path

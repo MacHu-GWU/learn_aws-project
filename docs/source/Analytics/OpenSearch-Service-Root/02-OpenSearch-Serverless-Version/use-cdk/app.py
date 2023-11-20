@@ -5,7 +5,7 @@ A simple CDK stack to create and configure an OpenSearch serverless collection.
 So you can create index, index data, search documents.
 Please read the doc string in :class:`Stack` for more details.
 
-Requirements: see ``deploy_cdk_requirements.txt``, or do ``pip install -r deploy_cdk_requirements.txt``.
+Requirements: see ``requirements.txt``, or do ``pip install -r requirements.txt``.
 
 Reference:
 
@@ -25,8 +25,9 @@ class Stack(cdk.Stack):
     collection.
 
     :param collection_name: the collection name, you can use alpha, letter, hyphen
-        but not underscore
-    :param iam_user_name: the IAM user name, not the full ARN.
+        but not underscore.
+    :param iam_entity_arn: the IAM entity arn that has the permission to manipulate
+        the collection.
     """
 
     def __init__(
@@ -34,7 +35,7 @@ class Stack(cdk.Stack):
         scope: Construct,
         construct_id: str,
         collection_name: str,
-        iam_user_name: str,
+        iam_entity_arn: str,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -125,7 +126,7 @@ class Stack(cdk.Stack):
                             },
                         ],
                         "Principal": [
-                            f"arn:aws:iam::{cdk.Aws.ACCOUNT_ID}:user/{iam_user_name}",
+                            iam_entity_arn,
                         ],
                     }
                 ]
@@ -138,17 +139,23 @@ class Stack(cdk.Stack):
             name=collection_name,
             type="SEARCH",
         )
+        self.collection.apply_removal_policy(cdk.RemovalPolicy.DESTROY)
 
 
 if __name__ == "__main__":
+    import boto3
+    from config import aws_profile, collection_name, stack_name
+
     app = cdk.App()
 
+    boto_ses = boto3.session.Session(profile_name=aws_profile)
+    iam_entity_arn = boto_ses.client("sts").get_caller_identity()["Arn"]
     stack = Stack(
         app,
-        construct_id="oss-cdk-demo",
-        collection_name="oss-cdk-demo",
-        iam_user_name="sanhe",
-        stack_name="oss-cdk-demo",
+        construct_id=stack_name,
+        collection_name=collection_name,
+        iam_entity_arn=iam_entity_arn,
+        stack_name=stack_name,
     )
 
     app.synth()

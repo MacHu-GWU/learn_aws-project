@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-A simple script to create and configure an OpenSearch serverless collection.
+A simple script to create and configure an OpenSearch serverless collection,
+then you can create index, index data, search documents.
 
-So you can create index, index data, search documents.
-
-Requirements: see ``create_and_configure_collection_requirements.txt``
+Requirements: see ``requirements.txt``
 
 Reference:
 
@@ -15,20 +14,12 @@ Reference:
 import typing as T
 import json
 import time
-from datetime import datetime, timezone
+import dataclasses
 
 import boto3
 import botocore.exceptions
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
-from rich import print as rprint
-
-
-def slugify(text: str) -> str:
-    """
-    Convert a string to slug.
-    """
-    return text.replace("_", "-")
 
 
 def create_encryption_policy(
@@ -64,10 +55,11 @@ def create_encryption_policy(
         return response
     except botocore.exceptions.ClientError as error:
         if error.response["Error"]["Code"] == "ConflictException":
-            print(
-                "[ConflictException] "
-                "The policy name or rules conflict with an existing policy."
-            )
+            if verbose:
+                print(
+                    "[ConflictException] "
+                    "The policy name or rules conflict with an existing policy."
+                )
             return None
         else:
             raise error
@@ -80,6 +72,7 @@ def create_network_policy(
 ) -> T.Optional[dict]:
     """
     Creates a network policy that matches the given collection.
+    The dashboard and collection are both public accessible.
     """
     try:
         response = oss_client.create_security_policy(
@@ -115,22 +108,42 @@ def create_network_policy(
         return response
     except botocore.exceptions.ClientError as error:
         if error.response["Error"]["Code"] == "ConflictException":
-            print(
-                "[ConflictException] " "A network policy with this name already exists."
-            )
+            if verbose:
+                print(
+                    "[ConflictException] "
+                    "A network policy with this name already exists."
+                )
             return None
         else:
             raise error
 
 
+@dataclasses.dataclass
+class IamUser:
+    name: str
+
+    def to_arn(self, aws_account_id: str):
+        return f"arn:aws:iam::{aws_account_id}:user/{self.name}"
+
+
+@dataclasses.dataclass
+class IamRole:
+    name: str
+
+    def to_arn(self, aws_account_id: str):
+        return f"arn:aws:iam::{aws_account_id}:role/{self.name}"
+
+
 def create_access_policy(
     oss_client,
     collection_name: str,
-    trusted_iam_entity_arns,
+    aws_account_id: str,
+    trusted_iam_entity_arns: T.List[str],
     verbose: bool = True,
 ) -> T.Optional[dict]:
     """
-    Creates a data access policy that matches the given collection.
+    Creates a data access policy that matches the given collection,
+    it allows the given IAM entities to access the collection.
     """
     try:
         response = oss_client.create_access_policy(
@@ -176,7 +189,11 @@ def create_access_policy(
         return response
     except botocore.exceptions.ClientError as error:
         if error.response["Error"]["Code"] == "ConflictException":
-            print("[ConflictException] An access policy with this name already exists.")
+            if verbose:
+                print(
+                    "[ConflictException] "
+                    "An access policy with this name already exists."
+                )
             return None
         else:
             raise error
@@ -185,6 +202,7 @@ def create_access_policy(
 def create_collection(
     oss_client,
     collection_name: str,
+    verbose: bool = True,
 ) -> T.Optional[dict]:
     """
     Creates a collection.
@@ -201,13 +219,18 @@ def create_collection(
         return response
     except botocore.exceptions.ClientError as error:
         if error.response["Error"]["Code"] == "ConflictException":
-            print(
-                "[ConflictException] "
-                "A collection with this name already exists. Try another name."
-            )
+            if verbose:
+                print(
+                    "[ConflictException] "
+                    "A collection with this name already exists. Try another name."
+                )
             return None
         else:
             raise error
+
+
+def _get_endpoint_from_connection_details(connection_details: dict) -> str:
+    return connection_details["collectionEndpoint"].replace("https://", "")
 
 
 def wait_for_collection_creation(
@@ -216,28 +239,35 @@ def wait_for_collection_creation(
     verbose: bool = True,
 ) -> str:
     """
-    Waits for the collection to become active
+    Waits for the collection to become active.
+
+    :return: the collection endpoint.
     """
     response = oss_client.batch_get_collection(names=[collection_name])
     # Periodically check collection status
-    while response["collectionDetails"][0]["status"] == "CREATING":
-        if verbose:
-            print("Creating collection...")
-        time.sleep(10)
-        response = oss_client.batch_get_collection(names=[collection_name])
-    if verbose:
-        print("Collection successfully created:")
-        print(response["collectionDetails"])
-    # Extract the collection endpoint from the response
-    host = response["collectionDetails"][0]["collectionEndpoint"]
-    collection_endpoint = host.replace("https://", "")
-    return collection_endpoint
+    while True:
+        collection_details = response["collectionDetails"][0]
+        status = collection_details["status"]
+        if status == "CREATING":
+            if verbose:
+                print("Creating collection...")
+            time.sleep(10)
+            response = oss_client.batch_get_collection(names=[collection_name])
+        elif status == "ACTIVE":
+            if verbose:
+                print("Collection successfully created:")
+            return _get_endpoint_from_connection_details(collection_details)
+        else:
+            raise SystemError(f"status is {status!r}!")
 
 
-def create_oss_object(
+def create_oss_object_by_collection_endpoint(
     boto_ses: boto3.session.Session,
     collection_endpoint: str,
 ) -> OpenSearch:
+    """
+    Create the opensearch-py SDK OpenSearch object from the boto3 session.
+    """
     credentials = boto_ses.get_credentials()
     awsauth = AWS4Auth(
         credentials.access_key,
@@ -252,87 +282,98 @@ def create_oss_object(
         use_ssl=True,
         verify_certs=True,
         connection_class=RequestsHttpConnection,
-        timeout=10,
+        timeout=300,
     )
     return oss
 
 
-def test_connection(oss: OpenSearch):
-    print("test opensearch serverless connection by listing indices ...")
+def create_oss_object_by_collection_name(
+    boto_ses: boto3.session.Session,
+    collection_name: str,
+) -> OpenSearch:
+    oss_client = boto_ses.client("opensearchserverless")
+    collection_endpoint = wait_for_collection_creation(
+        oss_client, collection_name, False
+    )
+    return create_oss_object_by_collection_endpoint(boto_ses, collection_endpoint)
+
+
+def test_oss_connection(
+    oss: OpenSearch,
+    verbose: bool = True,
+):
+    if verbose:
+        print("test opensearch serverless connection by listing indices ...")
     res = oss.cat.indices(format="json")
-    rprint(res)
+    if verbose:
+        print(res)
+        print("success!")
 
 
-def get_utc_now() -> datetime:
-    return datetime.utcnow().replace(tzinfo=timezone.utc)
+def create_and_configure(
+    aws_profile: str,
+    collection_name: str,
+    verbose: bool = True,
+) -> OpenSearch:
+    boto_ses = boto3.session.Session(profile_name=aws_profile)
+    res = boto_ses.client("sts").get_caller_identity()
+    aws_account_id = res["Account"]
+    iam_entity_arn = res["Arn"]
+    oss_client = boto_ses.client("opensearchserverless")
+    create_encryption_policy(oss_client, collection_name, verbose)
+    create_network_policy(oss_client, collection_name, verbose)
+    create_access_policy(
+        oss_client,
+        collection_name,
+        aws_account_id,
+        [iam_entity_arn],
+        verbose,
+    )
+    res = create_collection(oss_client, collection_name, verbose)
+    if res is None:
+        verbose_ = False
+    else:
+        verbose_ = True
+    collection_endpoint = wait_for_collection_creation(
+        oss_client,
+        collection_name,
+        verbose_,
+    )
+    oss = create_oss_object_by_collection_endpoint(boto_ses, collection_endpoint)
+    test_oss_connection(oss, verbose)
+    return oss
+
+
+def delete_collection(
+    aws_profile: str,
+    collection_name: str,
+    verbose: bool = True,
+):
+    """
+    Ref:
+
+    - delete_collection: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/opensearchserverless/client/delete_collection.html
+    """
+    boto_ses = boto3.session.Session(profile_name=aws_profile)
+    oss_client = boto_ses.client("opensearchserverless")
+    response = oss_client.batch_get_collection(names=[collection_name])
+    collection_details = response["collectionDetails"]
+    if len(collection_details) == 1:
+        collection_id = collection_details[0]["id"]
+        if verbose:
+            print("Deleting collection...")
+        response = oss_client.delete_collection(
+            id=collection_id,
+        )
+        if verbose:
+            print("done")
+    else:
+        if verbose:
+            print("Collection not found")
 
 
 if __name__ == "__main__":
-    # ------------------------------------------------------------------------------
-    # Enter your aws profile, trusted iam entity arn, collection name, and index name
-    # ------------------------------------------------------------------------------
-    aws_profile = "awshsh_app_dev_us_east_1"
-    boto_ses = boto3.session.Session(profile_name=aws_profile)
-    aws_account_id = boto_ses.client("sts").get_caller_identity()["Account"]
-    trusted_iam_entity_arns = [
-        f"arn:aws:iam::{aws_account_id}:user/sanhe",
-    ]
-    collection_name = "oss-demo"
-    index_name = "app_log"
+    from config import aws_profile, collection_name
 
-    oss_client = boto_ses.client("opensearchserverless")
-
-    # ------------------------------------------------------------------------------
-    create_encryption_policy(oss_client, collection_name)
-    create_network_policy(oss_client, collection_name)
-    create_access_policy(oss_client, collection_name, trusted_iam_entity_arns)
-    res = create_collection(oss_client, collection_name)
-    if res is None:
-        verbose = False
-    else:
-        verbose = True
-    collection_endpoint = wait_for_collection_creation(
-        oss_client, collection_name, verbose
-    )
-    oss = create_oss_object(boto_ses, collection_endpoint)
-    # test_connection(oss)
-
-    # ------------------------------------------------------------------------------
-    #
-    # ------------------------------------------------------------------------------
-    # oss.indices.delete(index=index_name, ignore=[400, 404])
-    res = oss.indices.create(
-        index=index_name,
-        body={
-            "mappings": {
-                "properties": {
-                    "time": {"type": "date", "format": "epoch_millis"},
-                    "log": {"type": "text"},
-                }
-            }
-        },
-        ignore=400,
-    )
-    if "error" not in res:
-        print(res)
-
-    oss.index(
-        index=index_name,
-        body={
-            "time": get_utc_now(),
-            "log": "login failed, username not found",
-        },
-        id="id-1",
-    )
-
-    res = oss.search(
-        index=index_name,
-        body={"query": {"match_all": {}}},
-    )
-    rprint(res)
-
-    res = oss.search(
-        index=index_name,
-        body={"query": {"match": {"log": "failed"}}},
-    )
-    rprint(res)
+    oss = create_and_configure(aws_profile, collection_name, verbose=True)
+    # delete_collection(aws_profile, collection_name, verbose=True)
