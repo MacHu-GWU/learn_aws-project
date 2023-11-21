@@ -27,7 +27,6 @@ CloudWatch Logs Insights (下面简称 Insights) 的查询语言是一个类 SQL
     | sort @timestamp desc
     | limit 20
 
-
 如果你的 Log Message 的结构是 ``{"server_id": "container-1", "processing_time": 500}``. 那么你可以直接用 JSON Dot Notation 来选择字段::
 
     fields @timestamp, @message, server_id, processing_time
@@ -48,11 +47,16 @@ CloudWatch Logs Insights (下面简称 Insights) 的查询语言是一个类 SQL
     | sort @timestamp desc
     | limit 20
 
+如果你的 filter 的条件有多个, 你可以用 `逻辑运算符 <https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax-operations-functions.html#CWL_QuerySyntax-operations-Boolean>`_ ``and``, ``or``, ``not`` 来连接它们. 就跟在 SQL 中的 ``WHERE col1 = value1 and col2 = value2`` 一样.
 
 Pattern
 ------------------------------------------------------------------------------
-Pattern 是一个很强大的函数, 它可以对你的 Log 进行采样, 然后分析出来有哪些 Pattern. 例如你有两条 JSON
-::
+Pattern 是一个很强大的函数, 它可以对你的 Log 进行采样, 然后分析出来有哪些 Pattern. 例如我们的测试数据中有两种不同模式的 JSON::
+
+    {"server_id": "container-1", "status": "succeeded"}
+    {"server_id": "container-1", "processing_time": 2000}
+
+那么 pattern 这个函数就可以自动分析出这两种 pattern 的 regex::
 
     fields @timestamp, @message
     | pattern @message
