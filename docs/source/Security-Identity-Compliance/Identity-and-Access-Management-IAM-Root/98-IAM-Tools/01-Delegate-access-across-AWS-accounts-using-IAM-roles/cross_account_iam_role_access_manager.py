@@ -12,12 +12,12 @@ AWS Accounts.
 Please scroll to the bottom (below the ``if __name__ == "__main__":`` section)
 to see the example usage.
 
-Pre-requisites:
+Requirements:
 
 - Python3.7+
+- Dependencies::
 
-Requirements::
-
+    # content of requirements.txt
     boto3
     cached-property>=1.5.2; python_version < '3.8'
     boto_session_manager>=1.5.2,<2.0.0
