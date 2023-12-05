@@ -25,6 +25,19 @@ AWS 最擅长的就是将开源技术部署在自家的云基础设施上, 将�
 本质上, Athena 就是一个或者很多个由 AWS 维护的超大规模 Presto 集群. 这个算力池子很大, 并且能弹性伸缩. 而用户实际上是从 AWS "租" Presto 算力来进行查询分析. 而用户完全无需关心基础设施, 调度等问题, 从而能专注于业务逻辑.
 
 
+How it Work
+------------------------------------------------------------------------------
+**Database and Table**
+
+在 RDBMS 系统中, 要使用 SQL 前你需要定义 Database, Table. 而在 Athena 中其中 Database 仅仅是一个逻辑概念, 是 Table 的集合. 每个 AWS Account 下有一个内置的 Database. 而每一个 Table 对应的其实是一堆描述你的 Dataset 的 metadata. 包括了你的数据储存在哪里 (location), 数据格式是什么 (format), 数据二维组织结构是怎样的 (schema), 如何对其进行反序列化, 也就是将其读取到内存 (serde), 有哪些人可以访问这个数据 (access), 数据量有多少, 有多少个文件 (statistics), 有没有 partition key 可以利用以避免全量扫描 (partition / index).
+
+AWS Glue Catalog 是 AWS 基于 Hadoop Hive 标准开发的中心化 Metadata Store, 你为定义的 Database / Table 又被叫做 Glue Database, Glue Table. 有了这些定义, Presto 就知道如何在你的 Dataset 上执行 SQL 查询了.
+
+**SQL 查询引擎原理**
+
+这本质上是 Presto 的内容, 不过这里我们就简单描述一下. 当你运行一个 SQL 的时候, Presto 的调度器 (Coordinator) 就会把你的 SQL 发给查询优化器 (Optimizor). 查询优化器就会根据你的 Glue Table 的信息, 分析应该怎么去执行这条 SQL. 然后调度器就会把查询按照 Partition 分发给许多 Worker 节点去执行, 然后执行的结果由调度器汇总, 最后返回给你.
+
+
 How to Learn Amazon Athena
 ------------------------------------------------------------------------------
 我建议先通读 FAQ, Pricing, What is Amazon Athena 这三部分. 这三个部分加起来也不长, 能很快的对 Athena 有一个大概的了解.

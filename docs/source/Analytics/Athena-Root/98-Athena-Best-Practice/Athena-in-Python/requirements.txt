@@ -1,0 +1,11 @@
+# test dependencies for pyathena
+awswrangler>=3.0.0,<4.0.0
+jsonpath_ng>=1.6.0,<2.0.0
+pyathena>=3.0.0,<4.0.0
+PyAthena[Pandas]
+PyAthena[SQLAlchemy]
+pandas>=2.0.0,<3.0.0
+sqlalchemy>=2.0.0,<3.0.0
+s3pathlib>=2.1.2,<3.0.0
+boto_session_manager>=1.5.4,<2.0.0
+smart_open>=6.0.0,<7.0.0
