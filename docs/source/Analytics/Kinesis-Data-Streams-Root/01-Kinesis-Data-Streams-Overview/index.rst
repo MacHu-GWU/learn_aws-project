@@ -39,7 +39,9 @@ Amazon Kinesis Data Streams Knowledge Graph
 - Reading from Data Stream:
     - Developing Custom Consumers with Shared Throughput
     - Developing Custom Consumers with Dedicated Throughput (Enhanced Fan-Out): 通常属于同一个 shard 的所有的 consumer 共享一个总的数据读取上限. 而这一功能能单独为一个 consumer 分配一个独立的读取上限.
-- KPL
+- KPL (Kinesis Producer Library)
+- KCL (Kinesis Client / Consumer Library)
+
 
 What's Next
 ------------------------------------------------------------------------------

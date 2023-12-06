@@ -1,3 +1,5 @@
+.. _aws-kinesis-data-streams-root:
+
 Kinesis Data Streams Root
 ==============================================================================
 

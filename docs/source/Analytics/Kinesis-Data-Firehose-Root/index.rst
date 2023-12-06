@@ -1,3 +1,5 @@
+.. _aws-kinesis-data-firehose-root:
+
 Kinesis Data Firehose Root
 ==============================================================================
 
