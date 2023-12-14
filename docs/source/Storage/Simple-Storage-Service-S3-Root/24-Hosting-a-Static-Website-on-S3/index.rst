@@ -135,6 +135,18 @@ Reference:
 - How can I restrict access to my Amazon S3 bucket using specific VPC endpoints or IP addresses?: https://repost.aws/knowledge-center/block-s3-traffic-vpc-ip
 
 
+S3 Policy 把 Admin 都 Deny 了怎么办
+------------------------------------------------------------------------------
+有的时候因为操作失误, 你给 S3 Bucket Policy 设置了一个 Deny All 的规则. 这就会导致连你的 Admin 都会被 Deny 掉, 无法将这个 Bucket Policy 该回去了. 这个时候唯一的办法就是用 Root Account, 也就是 email password 登录. 然后进到 S3 Bucket 中删除这个 Bucket Policy.
+
+如果你的 Account 是你用邮箱创建的还好. 但是如果你使用 AWS Organization 创建的, 你就需要用创建这个 Account 的时候的 email alias, 也就是带 + 号的那种. 例如你的 Org root email 是 alice@gmail.com, 那么你的 dev account 的 email 就会是 alice+dev@gmail.com. 你应该选择用 alice+dev@gmail.com 进行 root user 登录, 然后走一遍恢复密码的流程, AWS 会发一封 email 到你的 alice@gmail.com, 然后你就可以设一个密码, 然后用 root 登录, 把 bucket policy 删除即可.
+
+Reference:
+
+- `I accidentally denied everyone access to my Amazon S3 bucket. How do I regain access? <https://repost.aws/knowledge-center/s3-accidentally-denied-access>`_
+- `Accessing a member account as the root user <https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_accounts_access.html#orgs_manage_accounts_access-as-root>`_
+
+
 使用自己的 Domain 的关键步骤
 ------------------------------------------------------------------------------
 如果你想要用自己的 Domain (http://www.my-website.com) 作为 S3 上的 Static Website 的域名 (原本是 http://example-bucket.s3-website-us-west-1.amazonaws.com), **开启 CORS 是一个很关键的步骤**, `CORS <https://developer.mozilla.org/en-US/docs/Glossary/CORS>`_ (Cross-Origin Resource Sharing, 也叫跨域) 是 HTTP 协议中的一部分用于允许一个域读取另一个域上的资源的协议. 如果你没有更改域名, 你的请求是从 AWS 的域读取 S3 上的资源, 这个 AWS 域名和 S3 是同一个域, 所以你不需要 CORS. 而你更改了域名, 等于说是你的请求先到达你的域名服务提供商, 然后你的域名向 AWS 请求数据, 这时候 S3 就需要设置 CORS, 允许来自你的域名的请求.
