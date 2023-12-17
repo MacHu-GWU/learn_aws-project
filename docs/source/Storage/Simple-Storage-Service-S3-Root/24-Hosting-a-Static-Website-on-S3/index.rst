@@ -48,7 +48,7 @@ Deny 的部分有很多种选择, 但是通常的目的是为了默认 deny 所�
 
 这里的关键是 ``Condition`` 的部分. 这里还有几个例子可以参考.
 
-只允许来自于某些 VPC 的访问, 使用的是 VPC id::
+只允许来自于某些 VPC Endpoint 的访问, 使用的是 VPC id::
 
     "Condition": {
         "StringNotEquals": {
@@ -133,6 +133,15 @@ Reference:
 
 - Tutorial: Configuring a static website on Amazon S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/HostingWebsiteOnS3Setup.html
 - How can I restrict access to my Amazon S3 bucket using specific VPC endpoints or IP addresses?: https://repost.aws/knowledge-center/block-s3-traffic-vpc-ip
+
+
+Automation Script
+------------------------------------------------------------------------------
+下面我们提供了一个脚本, 能够方便地将一个 S3 Bucket 设置为可以 host static website 的状态.
+
+.. literalinclude:: ./setup_s3_bucket_for_static_website_hosting.py
+   :language: python
+   :linenos:
 
 
 S3 Policy 把 Admin 都 Deny 了怎么办
