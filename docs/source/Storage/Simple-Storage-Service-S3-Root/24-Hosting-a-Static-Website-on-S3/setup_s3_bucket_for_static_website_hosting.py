@@ -6,10 +6,8 @@ from urllib import request
 
 import botocore.exceptions
 
-
 if T.TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
-
 
 checkip_url = "https://checkip.amazonaws.com"
 
@@ -202,7 +200,7 @@ def put_bucket_policy_for_website_hosting(
 
     user_id_list = []
     if allowed_aws_account_id_list is not None:
-        user_id_list.extend(user_id_list)
+        user_id_list.extend(allowed_aws_account_id_list)
     if allowed_iam_user_id_list is not None:
         user_id_list.extend(allowed_iam_user_id_list)
     if allowed_iam_role_id_list is not None:
@@ -219,7 +217,7 @@ def put_bucket_policy_for_website_hosting(
 
     if condition:
         deny_statement = {
-            "Sid": "VpcSourceIp",
+            "Sid": "DenyAllExceptListedBelow",
             "Effect": "Deny",
             "Principal": "*",
             "Action": "s3:*",
@@ -246,10 +244,12 @@ if __name__ == "__main__":
     from boto_session_manager import BotoSesManager
     from rich import print as rprint
 
+
     def print_res(res: dict):
         if "ResponseMetadata" in res:
             del res["ResponseMetadata"]
         rprint(res)
+
 
     bsm = BotoSesManager(profile_name="bmt_app_devops_us_east_1")
     bucket = "bmt-app-devops-us-east-1-doc-host"
