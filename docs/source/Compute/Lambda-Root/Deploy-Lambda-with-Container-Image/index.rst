@@ -96,7 +96,7 @@ AWS 提供的 Base Image 已经实现好了 Runtime interface client, 所以你�
 
 其实很简单, 你只需要稍微修改一下你的 ``lambda_function.py`` 脚本, 把所有的 lambda function handlers 封装到一个新的函数中. 这个新的函数就是一个新的 Lambda function handler, 并且能够用参数选择运行底层的哪个 lambda function handlers.
 
-.. literalinclude:: ./lambda_function_1.py
+.. literalinclude:: ./lambda_function_2.py
    :language: python
    :linenos:
 
@@ -140,11 +140,12 @@ Then you can create a Lambda function from docker image and run test event.
 
 3. Understand the AWS Lambda Base Image
 ------------------------------------------------------------------------------
+.. code-block:: bash
 
-docker run --rm --name dev public.ecr.aws/lambda/python:3.8 ls /var
-docker run --rm -dt --name dev lambci/lambda:build-python3.8 pwd ~
-docker exec -it dev bash
-docker container stop dev
+    docker run --rm --name dev public.ecr.aws/lambda/python:3.8 ls /var
+    docker run --rm -dt --name dev lambci/lambda:build-python3.8 pwd ~
+    docker exec -it dev bash
+    docker container stop dev
 
 
 Reference
