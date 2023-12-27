@@ -20,7 +20,7 @@ Summary
 4. Promote innovation and agility: 允许开发者在隔离的环境中不受限制的实验一些东西有助于创新. 这里有 sandbox account 和 dev account 两个概念. sandbox account 指的是跟你的业务, data 完全 disconnected 的 account, 通常是可以不受限制的做实验. dev 则是能在受管制的情况下访问一些业务和 data, 同时又有比较大的 freedom 来做实验.
 5. Limit scope of impact from adverse events: 隔离风险
 6. Support multiple IT operating models: 不同公司有不同的 IT operating model (IT 管理模型), 显然如果只有一个 account 是无法适应复杂多变的需求. 而用多个 accounts 就能灵活的排列组合出你想要的需求了.
-7. Manage costs: 管理开支
+7. Manage costs: 管理开支. 例如可以用 consolidated billing 来管理多个 accounts 的费用. 还可以对不同的 Account 设置不同的 budget.
 8. Distribute AWS Service Quotas and API request rate limits: 每个 account 是有 service quotas 的, 对其进行分流可以有效的避免 quota limit 的问题.
 
 Ref:

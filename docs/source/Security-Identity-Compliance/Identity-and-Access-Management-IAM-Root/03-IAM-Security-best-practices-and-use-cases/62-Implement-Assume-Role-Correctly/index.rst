@@ -1,3 +1,5 @@
+.. _implement-assume-role-correctly:
+
 Implement Assume Role Correctly
 ==============================================================================
 在 AWS 的最佳实践中, 是不推荐为管理员以外的人创建 IAM User 的. 而是推荐用 Assumed Role 来管理 cross account 的权限. 创建一个可以被 Assumed 的 IAM Role 时要制定指定谁可以 Assume 这个 Role. 这里有一些常见的操作可能会导致安全隐患. 本文来介绍一下这些常见错误以及正确的做法.
