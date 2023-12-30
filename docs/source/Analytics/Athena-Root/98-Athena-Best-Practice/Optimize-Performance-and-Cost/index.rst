@@ -70,7 +70,7 @@ Use regexp_like instead of ``LIKE`` if multiple token used
 
 
 Use approx_distinct(my_column) instead of COUNT(DISTINCT my_column) if the exact number doesn't matter
-------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 如果你的 COUNT DISTINCT query 只是需要知道大概有多少个, 具体的值有个 1% 的误差也关系不大, 那么你就可以用 approx_distinct 来近似. 其原理主要是 HyperLogLog 算法.
 
 

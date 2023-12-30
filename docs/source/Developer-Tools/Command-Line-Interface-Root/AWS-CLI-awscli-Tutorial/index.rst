@@ -14,7 +14,7 @@ AWSCLI 早期是用 Python 写的并以一个 Python 包的形式存在 所以�
 
 Install or update the latest version of the AWS CLI
 ------------------------------------------------------------------------------
-首先我们需要安装. 如果是 V1, 那么就在 Python 中 ``pip install awscli`` 即可. 而对于 V2, 则是参考 `官方文档 <https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html>`_ 的说明要么从系统级的包管理安装, 要么下载安装包安装.
+首先我们需要安装. 如果是 V1, 那么就在 Python 中 ``pip install awscli`` 即可. 而对于 V2, 则是参考 `官方文档 Install or update the latest version of the AWS CLI <https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html>`_ 的说明要么从系统级的包管理安装, 要么下载安装包安装.
 
 **具体安装步骤**
 
@@ -25,7 +25,7 @@ Install or update the latest version of the AWS CLI
 
 Configure AWS CLI
 ------------------------------------------------------------------------------
-本节内容来自于这篇 `官方文档 <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html>`_.
+本节内容来自于这篇 `官方文档 Configuration and credential file settings <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html>`_.
 
 安装完成之后, 你可以用 ``aws configure`` 命令来启动一个 wizard, 然后按照提示输入信息来进行配置, 也可以直接编辑 ``~/.aws/config`` 和 ``~/.aws/credentials`` 文件来进行配置. 对于新手建议用 ``aws configure`` 而我个人喜欢直接来进行配置以获得更好的控制.
 

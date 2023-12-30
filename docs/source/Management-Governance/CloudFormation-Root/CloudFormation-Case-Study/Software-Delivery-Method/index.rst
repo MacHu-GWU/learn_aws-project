@@ -41,8 +41,7 @@ AWS Marketplace 是一个 AWS 的平台. 它允许软件公司像在 Amazon.com 
 
 2010 年后公有云开始发力, 大部分的软件从需要安装下载, 都变为了 SAAS (软件即服务). 用户无需进行一次性付费, 而是通过订阅进行使用. 例如微软的 Office 变成了网络版, 有浏览器就能用. ToB 的明星产品例如 Salesforce CRM, Snowflake 数据仓库, GitHub 代码仓库和 CI/CD 等等都变成了 SAAS 应用. 而 AWS 作为公有云厂商的领头羊, 更是增长迅速, 把传统软件开发和部署的蛋糕都纳入囊中.
 
-
-
+总的来说, 目前 2024 年比较主流的软件交付手段有:
 
 - SAAS (软件即服务): 比较新的软件像 GitHub, Snowflake 都是 SAAS 的服务, 用户注册账号, 绑定信用卡购买 Subscription, 就可以开始在网页界面使用了, 还能用 API 来进行操作. 用户无需自己部署任何东西.
 - License (需要激活): 比较传统的软件例如各种安全软件, 备份软件 都是需要购买 License 的. 用户提前购买了 License, 这个 License 一般允许用户在几年内安装最多 N 台机器. 用户通常需要在自己的服务器上进行下载安装, 然后输入 License Key 进行激活.
@@ -67,8 +66,7 @@ Product delivery methods
 Reference:
 
 - `Product delivery on AWS Marketplace <https://docs.aws.amazon.com/marketplace/latest/userguide/product-preparation.html#product-delivery>`_
-s3://edfre-euwest1-sbx-rdl-kpi-data/concept_data_collection/event_data/project_mrid=0fcab825-a778-11ea-a696-02c065a7aa34/concept_id=INVERTER_GAPC/year=2023/month=04
-s3://edfre-euwest1-sbx-rdl-kpi-data/concept_data_collection/event_data/project_mrid=0fcab825-a778-11ea-a696-02c065a7aa34/concept_id=INVERTER_GAPC/year=2023/month=04
+
 
 纯 SAAS 服务产品交付的架构
 ------------------------------------------------------------------------------

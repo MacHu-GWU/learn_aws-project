@@ -31,7 +31,7 @@ What is AWS CloudFormation Customer Resources
 
 Request Object
 ------------------------------------------------------------------------------
-下面是 CloudFormation 发送给 Custom Resource 的 Request JSON body. 如果是 Lambda Backed Resource, 以 Python 为例, 那么 ``def lambda_handler(event, context):`` 中的 event 的内容就是这个. 关于里面的每个字段的解释可以看 `这篇官方文档 <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-requests.html>`_. 其中 ``ResponseURL`` 是你需要将结果发送到的 URL. 而 ``ResourceProperties`` 则是你的 CloudFormation 中定义的 Custom Resource
+下面是 CloudFormation 发送给 Custom Resource 的 Request JSON body. 如果是 Lambda Backed Resource, 以 Python 为例, 那么 ``def lambda_handler(event, context):`` 中的 event 的内容就是这个. 关于里面的每个字段的解释可以看 这篇官方文档 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-requests.html. 其中 ``ResponseURL`` 是你需要将结果发送到的 URL. 而 ``ResourceProperties`` 则是你的 CloudFormation 中定义的 Custom Resource
  Properties 中除了 ServiceToken 的其他 Key Value Pair. 也就是你用来传递自定义参数的机制.
 
 .. code-block:: javascript
@@ -65,7 +65,7 @@ Request Object
 
 Response Object
 ------------------------------------------------------------------------------
-下面是你的 Custom Resource 需要给 ``ResponseURL`` 发送的 POST request 的 JSON body. 如果是 Lambda Backed Resource, 以 Python 为例, 那么用 Request 库发送 ``requests.post(response_url, body=json.dumps(payload)`` 中的 payload 的内容就是这个. 关于里面的每个字段的解释可以看 `这篇官方文档 <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-responses.html>`_
+下面是你的 Custom Resource 需要给 ``ResponseURL`` 发送的 POST request 的 JSON body. 如果是 Lambda Backed Resource, 以 Python 为例, 那么用 Request 库发送 ``requests.post(response_url, body=json.dumps(payload)`` 中的 payload 的内容就是这个. 关于里面的每个字段的解释可以看 这篇官方文档 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-responses.html
 
 下面是一个 Response Object 的例子.
 

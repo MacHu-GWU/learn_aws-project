@@ -15,7 +15,6 @@ Cloud Migration Strategy
 6. Retain
 
 
-
 How to Migrate
 ------------------------------------------------------------------------------
 按照 AWS 官方的说法, 一个 AWS Cloud Migration 的项目大约可以分为三步 Asset, Mobilize, Migrate and modernize. 简单来说:
@@ -136,6 +135,7 @@ Server Migration
 
     一般用 lift and shift, 将镜像和配置文件打包, 然后迁徙到 AWS EC2 上. 如果不允许停机, 则可以先迁徙但是不启用, 然后用软切换进行切换. 有很多工具例如 CloudEndure 可以帮助我们进行这个过程.
 
+
 Database Migration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 应用场景:
@@ -159,7 +159,7 @@ Database Migration
 
     1. 用 AWS DMS 服务将数据不断同步到 AWS RDS 上, 检测数据时延, 和数据一致性. 假设时延大约在 1 分钟左右.
     2. 将读请求指向 AWS RDS, 写请求指向旧数据库.
-    2. 然后暂停 1 分钟时间的写请求, 然后讲写请求也指向新 AWS RDS, 再恢复写请求.
+    3. 然后暂停 1 分钟时间的写请求, 然后讲写请求也指向新 AWS RDS, 再恢复写请求.
 
     值得注意的是针对不可以停机情况下的解决方案, 在很多非 Database Migration 的场景下的思路是一样的. 都是:
 

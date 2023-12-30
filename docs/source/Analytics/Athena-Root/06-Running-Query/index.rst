@@ -84,7 +84,7 @@ UDF 是 Athena 的一个功能, 它允许你自定义一个函数, 并用 AWS La
     LAMBDA 'lambda_function_name_or_ARN'[,...]]
     SELECT  [...] UDF_name(expression) [, UDF_name2(expression)] [...]
 
-详情请查看 `Querying with user defined functions<https://docs.aws.amazon.com/athena/latest/ug/querying-udf.html>`_
+详情请查看 `Querying with user defined functions <https://docs.aws.amazon.com/athena/latest/ug/querying-udf.html>`_
 
 Querying across regions
 ------------------------------------------------------------------------------

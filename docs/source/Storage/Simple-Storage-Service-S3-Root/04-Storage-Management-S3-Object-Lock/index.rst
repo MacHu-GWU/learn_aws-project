@@ -9,8 +9,7 @@ Summary
 
 .. important::
 
-    这个功能只能在创建 Bucket 的时候打开. 不能在已有的 Bucket 上打开. 你创建 Bucket 的时候设置的 Retention
- Period 会成为所有 Object 的默认设置. 而你在 Put object 的时候还可指定一个特定的 Retention Period 来覆盖 default 的设置.
+    这个功能只能在创建 Bucket 的时候打开. 不能在已有的 Bucket 上打开. 你创建 Bucket 的时候设置的 Retention Period 会成为所有 Object 的默认设置. 而你在 Put object 的时候还可指定一个特定的 Retention Period 来覆盖 default 的设置.
 
 Reference:
 
