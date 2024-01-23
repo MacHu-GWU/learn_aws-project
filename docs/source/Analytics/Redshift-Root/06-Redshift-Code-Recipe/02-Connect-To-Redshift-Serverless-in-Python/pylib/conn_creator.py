@@ -3,14 +3,15 @@
 import typing as T
 import redshift_connector
 
+# sqlalchemy is optional
 try:
     import sqlalchemy as sa
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 from .model import WorkGroup, Namespace
 
-if T.TYPE_CHECKING:
+if T.TYPE_CHECKING:  # pragma: no cover
     import boto3
 
 
