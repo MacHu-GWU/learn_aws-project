@@ -1,6 +1,4 @@
-Redshift Serverless Management
+Bedrock Root
 ==============================================================================
-Keywords: AWS, Amazon, Redshift, Serverless, sls.
-
 .. autotoctree::
     :maxdepth: 1

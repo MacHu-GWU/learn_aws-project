@@ -185,7 +185,7 @@ def build_fts_anything_dataset(
             {
                 "name": "search",
                 "type_is_store": False,
-                "type_is_ngram": True,
+                "type_is_ngram_words": True,
                 "ngram_minsize": 2,
                 "ngram_maxsize": 10,
             },
