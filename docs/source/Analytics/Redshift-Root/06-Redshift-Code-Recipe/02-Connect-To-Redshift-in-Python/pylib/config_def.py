@@ -18,6 +18,7 @@ class Config:
     username: T.Optional[str] = dataclasses.field(default=None)
     password: T.Optional[str] = dataclasses.field(default=None)
     workgroup: T.Optional[str] = dataclasses.field(default=None)
+    cluster_id: T.Optional[str] = dataclasses.field(default=None)
 
     @classmethod
     def load(cls, path: Path):

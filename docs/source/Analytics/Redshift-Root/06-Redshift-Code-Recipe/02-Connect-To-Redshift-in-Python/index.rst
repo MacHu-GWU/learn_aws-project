@@ -1,4 +1,4 @@
-Connect To Redshift Serverless in Python
+Connect To Redshift in Python
 ==============================================================================
 
 
@@ -33,16 +33,17 @@ Data API 是云原生产品的一大优势. AWS 允许你用 Rest API 异步执�
 - `Redshift Data API boto3 document <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/redshift-data.html>`_
 
 
-Pre-requisite
+Trouble Shoot
 ------------------------------------------------------------------------------
-1. 注意你的 WorkGroup 的 Security Group 白名单里有你的 IP 地址.
+1. 注意你的 Cluster 或 WorkGroup 的 Security Group 白名单里有你的 IP 地址.
+2. 如果你的网络不是在 VPC 中的, 注意你的 Cluster 是否开启了 Public Access.
 
 
 Sample Code
 ------------------------------------------------------------------------------
 这里我把用多种方法连接到 Redshift 并进行简单的 CRUD 操作的代码封装成了一个简单的库, 方便以后调用.
 
-- `pylib <https://github.com/MacHu-GWU/learn_aws-project/tree/main/docs/source/Analytics/Redshift-Root/06-Redshift-Code-Recipe/02-Connect-To-Redshift-Serverless-in-Python/pylib>`_
+- `pylib <https://github.com/MacHu-GWU/learn_aws-project/tree/main/docs/source/Analytics/Redshift-Root/06-Redshift-Code-Recipe/02-Connect-To-Redshift-in-Python/pylib>`_
 
 .. dropdown:: test_create_connect_for_serverless_using_iam.py
 
@@ -53,6 +54,18 @@ Sample Code
 .. dropdown:: test_create_sqlalchemy_engine_for_serverless_using_iam.py
 
     .. literalinclude:: ./test_create_sqlalchemy_engine_for_serverless_using_iam.py
+       :language: python
+       :linenos:
+
+.. dropdown:: test_create_connect_for_cluster_using_iam.py
+
+    .. literalinclude:: ./test_create_connect_for_cluster_using_iam.py
+       :language: python
+       :linenos:
+
+.. dropdown:: test_create_sqlalchemy_engine_for_cluster_using_iam.py
+
+    .. literalinclude:: ./test_create_sqlalchemy_engine_for_cluster_using_iam.py
        :language: python
        :linenos:
 
