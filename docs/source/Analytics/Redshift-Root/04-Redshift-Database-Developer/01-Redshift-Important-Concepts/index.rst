@@ -69,6 +69,7 @@ Reference:
 
 - `Columnar storage <https://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html>`_
 
+
 .. _redshift-column-compression:
 
 Column Compression
