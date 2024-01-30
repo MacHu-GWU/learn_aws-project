@@ -1,5 +1,6 @@
 Connect To Redshift in Python
 ==============================================================================
+Keywords: AWS, Amazon, Redshift, Connect
 
 
 How it Works
