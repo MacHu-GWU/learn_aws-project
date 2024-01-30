@@ -10,7 +10,7 @@ from pathlib import Path
 import pandas as pd
 import awswrangler as wr
 
-import pylib.api as pylib
+import aws_redshift_helper.api as rs
 
 
 def create_table_and_load_data():
@@ -61,16 +61,17 @@ aws_account_id = boto_ses.client("sts").get_caller_identity()["Account"]
 aws_region = boto_ses.region_name
 
 # create redshift connection
-conn = pylib.create_connect_for_serverless_using_iam(
+conn = rs.create_connect_for_serverless_using_iam(
     boto_ses=boto_ses,
     workgroup_name=config_serverless.workgroup,
 )
 
-pylib.test_connection(conn)
+rs.test_connection(conn)
 
 # write data and read data
 bucket = f"{aws_account_id}-{aws_region}-data"
 s3_dir_uri = f"s3://{bucket}/project/redshift-serverless-poc/"
+print(s3_dir_uri)
 TABLE_NAME = "transactions"
 
 create_table_and_load_data()

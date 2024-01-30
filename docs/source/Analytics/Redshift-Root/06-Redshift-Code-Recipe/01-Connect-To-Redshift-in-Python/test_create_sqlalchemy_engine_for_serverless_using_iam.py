@@ -14,7 +14,7 @@ from datetime import datetime
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 
-import pylib.api as pylib
+import aws_redshift_helper.api as rs
 
 
 Base = orm.declarative_base()
@@ -97,18 +97,18 @@ def select_data(engine: "sa.engine.Engine"):
 # load your config
 dir_here = Path(__file__).absolute().parent
 path_config_serverless = dir_here / "config-serverless.json"
-config_serverless = pylib.Config.load(path_config_serverless)
+config_serverless = rs.Config.load(path_config_serverless)
 
 # create boto session
 boto_ses = boto3.session.Session()
 
 # create sqlalchemy engine
-engine = pylib.create_sqlalchemy_engine_for_serverless_using_iam(
+engine = rs.create_sqlalchemy_engine_for_serverless_using_iam(
     boto_ses=boto_ses,
     workgroup_name=config_serverless.workgroup,
 )
 
-pylib.test_engine(engine)
+rs.test_engine(engine)
 create_table(engine)
 insert_data(engine)
 select_data(engine)

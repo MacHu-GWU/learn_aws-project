@@ -12,6 +12,7 @@ from pathlib import Path
 
 @dataclasses.dataclass
 class Config:
+    aws_profile: T.Optional[str] = dataclasses.field(default=None)
     host: T.Optional[str] = dataclasses.field(default=None)
     port: T.Optional[int] = dataclasses.field(default=None)
     database: T.Optional[str] = dataclasses.field(default=None)

@@ -8,6 +8,8 @@ import typing as T
 import dataclasses
 from datetime import datetime
 
+import botocore.exceptions
+
 
 @dataclasses.dataclass
 class BaseModel:
@@ -34,6 +36,9 @@ class WorkGroupEndpoint(BaseModel):
 
 @dataclasses.dataclass
 class WorkGroup(BaseModel):
+    """
+    WorkGroup object.
+    """
     # fmt: off
     workgroupId: T.Optional[str] = dataclasses.field(default=None)
     workgroupName: T.Optional[str] = dataclasses.field(default=None)
@@ -63,7 +68,7 @@ class WorkGroup(BaseModel):
 
         - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/redshift-serverless/client/get_workgroup.html
         """
-        if isinstance(res.get("workgroup", {}), dict):
+        if "workgroup" in res and "workgroupName" not in res:
             data = res["workgroup"]
         else:
             data = res
@@ -79,9 +84,24 @@ class WorkGroup(BaseModel):
         data["endpoint"] = endpoint
         return cls._from_dict(data)
 
+    @classmethod
+    def from_name(cls, rs_sls_client, name: str) -> T.Optional["WorkGroup"]:
+        try:
+            res = rs_sls_client.get_workgroup(workgroupName=name)
+            return cls.from_get_workgroup_response(res["workgroup"])
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "ResourceNotFoundException":
+                return None
+            else:  # pragma: no cover
+                raise e
+
 
 @dataclasses.dataclass
 class Namespace(BaseModel):
+    """
+    Namespace object.
+    """
+    # fmt: off
     namespaceArn: T.Optional[str] = dataclasses.field(default=None)
     namespaceId: T.Optional[str] = dataclasses.field(default=None)
     namespaceName: T.Optional[str] = dataclasses.field(default=None)
@@ -95,6 +115,7 @@ class Namespace(BaseModel):
     iamRoles: T.Optional[T.List[str]] = dataclasses.field(default=None)
     kmsKeyId: T.Optional[str] = dataclasses.field(default=None)
     logExports: T.Optional[T.List[str]] = dataclasses.field(default=None)
+    # fmt: on
 
     @classmethod
     def from_get_namespace_response(cls, res: dict):
@@ -103,11 +124,22 @@ class Namespace(BaseModel):
 
         - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/redshift-serverless/client/get_namespace.html
         """
-        if isinstance(res.get("namespace", {}), dict):
+        if "namespace" in res and "namespaceName" not in res:
             data = res["namespace"]
         else:
             data = res
         return cls._from_dict(data)
+
+    @classmethod
+    def from_name(cls, rs_sls_client, name: str) -> T.Optional["Namespace"]:
+        try:
+            res = rs_sls_client.get_namespace(namespaceName=name)
+            return cls.from_get_namespace_response(res["namespace"])
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "ResourceNotFoundException":
+                return None
+            else:  # pragma: no cover
+                raise e
 
 
 @dataclasses.dataclass
@@ -118,6 +150,7 @@ class ClusterEndpoint(BaseModel):
 
 @dataclasses.dataclass
 class Cluster(BaseModel):
+    # fmt: off
     ClusterIdentifier: T.Optional[str] = dataclasses.field(default=None)
     NodeType: T.Optional[str] = dataclasses.field(default=None)
     ClusterStatus: T.Optional[str] = dataclasses.field(default=None)
@@ -157,20 +190,12 @@ class Cluster(BaseModel):
     PendingActions: T.Optional[T.List[str]] = dataclasses.field(default=None)
     MaintenanceTrackName: T.Optional[str] = dataclasses.field(default=None)
     ElasticResizeNumberOfNodeOptions: T.Optional[str] = dataclasses.field(default=None)
-    DeferredMaintenanceWindows: T.Optional[T.List[dict]] = dataclasses.field(
-        default=None
-    )
+    DeferredMaintenanceWindows: T.Optional[T.List[dict]] = dataclasses.field(default=None)
     SnapshotScheduleIdentifier: T.Optional[str] = dataclasses.field(default=None)
     SnapshotScheduleState: T.Optional[str] = dataclasses.field(default=None)
-    ExpectedNextSnapshotScheduleTime: T.Optional[datetime] = dataclasses.field(
-        default=None
-    )
-    ExpectedNextSnapshotScheduleTimeStatus: T.Optional[str] = dataclasses.field(
-        default=None
-    )
-    NextMaintenanceWindowStartTime: T.Optional[datetime] = dataclasses.field(
-        default=None
-    )
+    ExpectedNextSnapshotScheduleTime: T.Optional[datetime] = dataclasses.field(default=None)
+    ExpectedNextSnapshotScheduleTimeStatus: T.Optional[str] = dataclasses.field(default=None)
+    NextMaintenanceWindowStartTime: T.Optional[datetime] = dataclasses.field(default=None)
     ResizeInfo: T.Optional[dict] = dataclasses.field(default=None)
     AvailabilityZoneRelocationStatus: T.Optional[str] = dataclasses.field(default=None)
     ClusterNamespaceArn: T.Optional[str] = dataclasses.field(default=None)
@@ -180,14 +205,13 @@ class Cluster(BaseModel):
     ReservedNodeExchangeStatus: T.Optional[dict] = dataclasses.field(default=None)
     CustomDomainName: T.Optional[str] = dataclasses.field(default=None)
     CustomDomainCertificateArn: T.Optional[str] = dataclasses.field(default=None)
-    CustomDomainCertificateExpiryDate: T.Optional[datetime] = dataclasses.field(
-        default=None
-    )
+    CustomDomainCertificateExpiryDate: T.Optional[datetime] = dataclasses.field(default=None)
     MasterPasswordSecretArn: T.Optional[str] = dataclasses.field(default=None)
     MasterPasswordSecretKmsKeyId: T.Optional[str] = dataclasses.field(default=None)
     IpAddressType: T.Optional[str] = dataclasses.field(default=None)
     MultiAZ: T.Optional[str] = dataclasses.field(default=None)
     MultiAZSecondary: T.Optional[dict] = dataclasses.field(default=None)
+    # fmt: on
 
     @classmethod
     def from_describe_clusters_response(cls, res: dict):
@@ -196,7 +220,7 @@ class Cluster(BaseModel):
 
         - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/redshift/client/describe_clusters.html
         """
-        if isinstance(res.get("Clusters", []), list):
+        if "Clusters" in res and "ClusterIdentifier" not in res:
             _clusters = res["Clusters"]
             if len(_clusters):
                 data = _clusters[0]
@@ -215,3 +239,20 @@ class Cluster(BaseModel):
 
         data["Endpoint"] = Endpoint
         return cls._from_dict(data)
+
+    @classmethod
+    def from_cluster_id(
+        cls,
+        rs_client,
+        cluster_id: str,
+    ) -> T.Optional["Cluster"]:
+        try:
+            res = rs_client.describe_clusters(
+                ClusterIdentifier=cluster_id,
+            )
+            return cls.from_describe_clusters_response(res["Clusters"][0])
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "ClusterNotFoundFault":
+                return None
+            else:  # pragma: no cover
+                raise e

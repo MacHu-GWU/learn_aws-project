@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+Redshift connection creator.
+"""
+
 import typing as T
 import redshift_connector
 
@@ -21,9 +25,13 @@ def get_database_by_workgroup(
 ) -> T.Tuple[str, WorkGroup, Namespace]:
     """
     Get the database of the namespace associated with the workgroup.
+
+    :param redshift_serverless_client: boto3.client("redshift-serverless") object
+    :parma workgroup_name: serverless workgroup name.
+
+    :return: database name, :class:`~aws_redshift_helper.model.WorkGroup` object, :class:`~aws_redshift_helper.model.Namespace` object
     """
-    res = redshift_serverless_client.get_workgroup(workgroupName=workgroup_name)
-    workgroup = WorkGroup.from_get_workgroup_response(res)
+    workgroup = WorkGroup.from_name(redshift_serverless_client, workgroup_name)
     res = redshift_serverless_client.get_namespace(
         namespaceName=workgroup.namespaceName
     )
@@ -41,6 +49,8 @@ def create_connect_for_serverless_using_iam(
 
     :param boto_ses: boto3 session object.
     :param workgroup_name: serverless workgroup name.
+
+    :return: ``redshift_connector.Connection`` object.
     """
     rs_sls_client = boto_ses.client("redshift-serverless")
     database, _, _ = get_database_by_workgroup(rs_sls_client, workgroup_name)
@@ -68,6 +78,8 @@ def create_sqlalchemy_engine_for_serverless_using_iam(
     :param boto_ses: boto3 session object.
     :param workgroup_name: serverless workgroup name.
     :param duration: credential duration in seconds.
+
+    :return: ``sqlalchemy.engine.Engine`` object.
     """
     rs_sls_client = boto_ses.client("redshift-serverless")
     database, workgroup, namespace = get_database_by_workgroup(
@@ -94,10 +106,14 @@ def get_database_by_cluster_id(
     cluster_id: str,
 ) -> T.Tuple[str, Cluster]:
     """
-    Get the database of the namespace associated with the workgroup.
+    Get the database of the provisioned cluster.
+
+    :param redshift_client: boto3.client("redshift") object
+    :parma cluster_id: Redshift cluster id.
+
+    :return: database name, :class:`~aws_redshift_helper.model.Cluster` object
     """
-    res = redshift_client.describe_clusters(ClusterIdentifier=cluster_id)
-    cluster = Cluster.from_describe_clusters_response(res)
+    cluster = Cluster.from_cluster_id(redshift_client, cluster_id)
     database = cluster.DBName
     return database, cluster
 
@@ -111,6 +127,8 @@ def create_connect_for_cluster_using_iam(
 
     :param boto_ses: boto3 session object.
     :param cluster_id: Redshift cluster id.
+
+    :return: ``redshift_connector.Connection`` object.
     """
     rs_client = boto_ses.client("redshift")
     database, _ = get_database_by_cluster_id(rs_client, cluster_id)
@@ -139,6 +157,8 @@ def create_sqlalchemy_engine_for_cluster_using_iam(
     :param boto_ses: boto3 session object.
     :param cluster_id: Redshift cluster_id
     :param duration: credential duration in seconds.
+
+    :return: ``sqlalchemy.engine.Engine`` object.
     """
     rs_client = boto_ses.client("redshift")
     database, cluster = get_database_by_cluster_id(rs_client, cluster_id)
