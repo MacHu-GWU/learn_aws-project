@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import textwrap
 from pathlib import Path
 from datetime import datetime
@@ -7,23 +8,31 @@ from datetime import datetime
 import boto3
 import pandas as pd
 import awswrangler as wr
+from s3pathlib import S3Path, context
 from rich import print as rprint
 
-import aws_redshift_helper.api as rs_helper
+import aws_redshift_helper.api as rs
 
-config = rs_helper.Config.load(Path("config-serverless.json"))
+config = rs.Config.load(Path("config-serverless.json"))
 boto_ses = boto3.session.Session(profile_name=config.aws_profile)
+context.attach_boto_session(boto_ses)
 aws_account_id = boto_ses.client("sts").get_caller_identity()["Account"]
 aws_region = boto_ses.region_name
 rs_sls_client = boto_ses.client("redshift-serverless")
 rs_data_client = boto_ses.client("redshift-data")
-database, _, _ = rs_helper.get_database_by_workgroup(rs_sls_client, config.workgroup)
+database, _, _ = rs.get_database_by_workgroup(rs_sls_client, config.workgroup)
 bucket = f"{aws_account_id}-{aws_region}-data"
-s3_dir_uri = f"s3://{bucket}/projects/redshift-serverless-poc/"
-conn = rs_helper.create_connect_for_serverless_using_iam(
+s3dir_staging = S3Path(
+    f"s3://{bucket}/projects/redshift-serverless-poc/staging/"
+).to_dir()
+s3dir_unload = S3Path(
+    f"s3://{bucket}/projects/redshift-serverless-poc/unload/"
+).to_dir()
+conn = rs.create_connect_for_serverless_using_iam(
     boto_ses=boto_ses,
     workgroup_name=config.workgroup,
 )
+T_TRANSACTIONS = "transactions"
 T_JSON_TEST = "json_test"
 
 
@@ -35,7 +44,7 @@ def run_sql(
     A wrapper to automatically set parameters other than ``sql`` for ``run_sql``
     function.
     """
-    columns, rows = rs_helper.run_sql(
+    columns, rows = rs.run_sql(
         rs_data_client=rs_data_client,
         sql=sql,
         database=database,
@@ -93,7 +102,7 @@ def load_data():
     # awswrangler will dump the data to parquet file, parquet is schema self-contained format
     wr.redshift.copy(
         df=df,
-        path=s3_dir_uri,
+        path=s3dir_staging.uri,
         con=conn,
         schema="public",
         table=T_JSON_TEST,
@@ -109,9 +118,28 @@ def select_data():
     run_sql(sql=f"SELECT * FROM {T_JSON_TEST};")
 
 
+def unload_data():
+    s3dir_unload.delete()
+    sql = f"SELECT * FROM {T_TRANSACTIONS}"
+    final_sql = rs.build_unload_sql(
+        raw_sql=sql,
+        s3_uri=s3dir_unload.uri,
+        format="JSON",
+    )
+    run_sql(sql=final_sql, no_result=True)
+
+    rows = list()
+    for s3path in s3dir_unload.iter_objects():
+        for line in s3path.read_text().split("\n"):
+            if line:
+                rows.append(json.loads(line))
+    rprint(rows)
+
+
 if __name__ == "__main__":
-    create_table()
+    # create_table()
     # drop_table()
-    delete_table()
-    load_data()
-    select_data()
+    # delete_table()
+    # load_data()
+    # select_data()
+    unload_data()
