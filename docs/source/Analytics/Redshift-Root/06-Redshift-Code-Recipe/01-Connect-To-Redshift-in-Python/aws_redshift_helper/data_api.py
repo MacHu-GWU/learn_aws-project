@@ -102,8 +102,13 @@ def run_sql(
             elif status in ["SUBMITTED", "PICKED", "STARTED"]:
                 continue
             # raise exception when failed
-            elif status in ["FAILED", "ABORTED"]:
-                raise RuntimeError(f"reached status {status!r}")
+            elif status == "FAILED":
+                raise RuntimeError("FAILED! error: {}".format(res["Error"]))
+            elif status == "ABORTED":
+                print(res)
+                raise RuntimeError("ABORTED!")
+            else:  # pragma: no cover
+                raise NotImplementedError
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "ResourceNotFoundException":
                 continue

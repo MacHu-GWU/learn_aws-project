@@ -137,9 +137,10 @@ def unload_data():
 
 
 if __name__ == "__main__":
+    """ """
     # create_table()
     # drop_table()
     # delete_table()
     # load_data()
     # select_data()
-    unload_data()
+    # unload_data()
