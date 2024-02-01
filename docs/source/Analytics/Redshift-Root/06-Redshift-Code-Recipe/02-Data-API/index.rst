@@ -31,6 +31,15 @@ Data API Use Case
 简而言之, 对于高频率, 但是查询时间不长的 Query 用 Data API 进行编程是非常便利的.
 
 
+VPN Endpoint
+------------------------------------------------------------------------------
+Data API 是一个 service, 你从客户端发起的请求默认是走公网到达 public facing 的 AWS 的 API 服务器, 然后获得数据的. 这个 Data API 跟 DynamoDB 的 API 可以说是一模一样的. 而类似的, 在企业中就会有让客户端和 API 通信之间的信道不走公网的需求. 这个时候就需要用到 VPN Endpoint 了.
+
+Reference:
+
+- `Connecting to Amazon Redshift using an interface VPC endpoint <https://docs.aws.amazon.com/redshift/latest/mgmt/security-private-link.html>`_: 如何为 Redshift 配置 VPN Endpoint 的文档.
+
+
 The AWS Redshift Helper Library
 ------------------------------------------------------------------------------
 使用 Data API 运行 SQL 主要有三个步骤:
