@@ -54,9 +54,13 @@ AWS Lambda 作为一款主打 Function As a Service 的服务, 无需管理服�
    :language: docker
    :linenos:
 
+我们可能知道用多阶段构建的技巧可以极大程度减小镜像的体积. 在构建 Lambda 的镜像时这个技巧不是很必要. 这是因为在构建其他镜像时 (例如 ECS Task), 你可能要直接在容器中进行一些测试, 那么就需要安装很多用于测试的依赖. 这时用多阶段构建在第二部只保留必要的核心依赖是有必要的. 但在 Lambda 项目中, 所有的单元测试会在构建容器之间就完成了, 而集成测试则在构建完镜像之后进行. 所以构建 Lambda 的 Dockerfile 中一般只有核心必要的依赖, 也就不太需要多阶段构建的技巧了.
+
+这里再提一点, 你在 ECR Gallery 上看到的镜像体积是压缩后的体积. 而你在本地 Docker pull 下来的镜像是解压缩后的大小. 一般你本地的镜像大小要比较大. 这个你不要担心, 你把构建好的镜像 Push 到 ECR Gallery 之后的大小也是压缩后的大小. 并且 Lambda 初始化的时候 pull 镜像的网络 IO 也只取决于压缩后的大小. 以 AWS 内部的网络速度, 1 个 G 也就几秒钟不到.
+
 **在本地测试 Lambda Function**
 
-AWS 提供的 Base Image 已经实现好了 Runtime interface client, 所以你可以直接在本地用 ``docker run ...`` 命令启动容器, 这个容器会暴漏 9000 端口 (你可以自己改) 给宿主机. 这个运行动作其实就是模拟 AWS 初始化 Lambda 容器的过程, 并 import 所有的依赖, 之后你只要调用这个函数即可.
+AWS 提供的 Base Image 已经实现好了 Runtime interface client, 所以你可以直接在本地用 ``docker run ...`` 命令启动容器, 这个容器会暴漏 9000 端口 (你可以自己改) 给宿主机. 这个运行动作其实就是模拟 AWS 初始化 Lambda 容器的过程, 并 import 所有的依赖, 之后你只要调用这个函数即可. 而如果你的 Lambda 需要 AWS 权限, 那么你可以在运行 ``docker run ...`` 的时候用 ``-e env_var=value`` 来设置 ``AWS_ACCESS_KEY_ID``, ``AWS_SECRET_ACCESS_KEY``, ``AWS_REGION`` 等环境变量
 
 .. code-block:: bash
 
