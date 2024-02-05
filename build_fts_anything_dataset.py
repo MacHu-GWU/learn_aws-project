@@ -151,6 +151,8 @@ def build_fts_anything_dataset(
     for path in dir_source.glob("**/*"):
         if path.suffix not in [".rst", ".ipynb"]:
             continue
+        if "/tmp/" in str(path):
+            continue
         try:
             # 提取 title 和 keywords
             title, keywords = extract_title_and_keywords(path)
