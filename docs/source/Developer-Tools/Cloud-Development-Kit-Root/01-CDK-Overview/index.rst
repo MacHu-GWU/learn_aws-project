@@ -120,7 +120,7 @@ Reference:
 ------------------------------------------------------------------------------
 .. important::
 
-    本节的代码都在这篇文档的目录下. 这个目录适合用于一个非生产环境, 探索实验性质的 CDK 项目. 比如你想快速实验一个 CDK 中的功能, 你可以复制这个目录, 对其进行简单修改就可以开始尝试了.
+    本节的代码都在这篇文档的目录下. 这个目录适合用于一个非生产环境, 探索实验性质的 CDK 项目. 比如你想快速实验一个 CDK 中的功能, 你可以复制这个目录 (`GitHub 链接 <https://github.com/MacHu-GWU/learn_aws-project/tree/main/docs/source/Developer-Tools/Cloud-Development-Kit-Root/01-CDK-Overview>`_, 对其进行简单修改就可以开始尝试了.
 
 
 3.1 BootStrap 引导程序
@@ -164,7 +164,7 @@ Reference:
 
 3.2 部署 CDK Stack
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-我们现在可以写 CDK 代码, 并开始部署 CDK Stack 了. 这个用于教学的 CDK Stack 里只有一个 IAM Group. 之所以用 IAM Group 作为例子是因为 IAM Group 不设计到任何数据, 仅仅是一个抽象的 Container. 创建和删除的速度都非常快.
+我们现在可以写 CDK 代码, 并开始部署 CDK Stack 了. 这个用于教学的 CDK Stack 里只有一个 IAM Group. 之所以用 IAM Group 作为例子是因为 IAM Group 不涉及到任何数据, 仅仅是一个抽象的 Container. 创建和删除的速度都非常快.
 
 建议你按照顺序依次执行下面的命令:
 
