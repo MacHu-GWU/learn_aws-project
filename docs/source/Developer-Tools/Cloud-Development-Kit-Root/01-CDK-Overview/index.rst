@@ -184,6 +184,9 @@ Reference:
     pip install -r requirements-dev.txt
     pip install -r requirements-test.txt
 
+    # 单元测试
+    python test.py
+
     # 部署
     python run_cdk_deploy.py
 
