@@ -12,6 +12,8 @@ Step Functions 是一个 Serverless 无服务器的服务. Serverless 产品主�
 
 Pricing
 ------------------------------------------------------------------------------
+State Machine 有两种不同的 Workflow. Standard 适合
+
 - Standard: $0.025 per 1000 transition. 可见对于 long polling 的 workflow, 每次 wait 的间隔应该尽量长一点, 这样可以减少 transition 的次数.
 - Express: 可以看出, 它跟 Lambda Function 的收费类似. 可能它的底层实现就是就是一个自带异常处理的 Lambda Function.
     - Request:
@@ -21,6 +23,16 @@ Pricing
         - $0.00001667 per GB-Second ($0.0600 per GB-hour) for the first 1,000 hours GB-hours
         - $0.00000833 per GB-Second ($0.0300 per GB hour) for the next 4,000 hours GB-hours
         - $0.00000456 per GB-Second ($0.01642 per GB-hour) beyond that
+
+收费的因素对于 Standard 和 Express 两种类型的 State Machine 是不同的:
+
+- Standard 由于是长时间运行, 常用于 Async run, 它只按照在 State 之间的 transition (转移) 次数来计费. 也就是说你中键即使 Wait 了很久, Wait 的期间不会被计费.
+- Express 由于是短时间运行, 常用于 Sync Run, 它只按照 Invoke 的次数, 以及 Duration + Memory (和 Lambda 相似) 来计费. 如果你有 Parallel 和 Map, 会有大量的 Payload, 那么这些 Payload 也会被计费.
+
+Reference:
+
+- AWS Step Functions Pricing: https://aws.amazon.com/step-functions/pricing/
+- Building cost-effective AWS Step Functions workflows: https://aws.amazon.com/blogs/compute/building-cost-effective-aws-step-functions-workflows/
 
 
 Reference
