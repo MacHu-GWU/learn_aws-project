@@ -9,7 +9,6 @@ Overview
 
 Diagram
 ------------------------------------------------------------------------------
-afd
 .. raw:: html
     :file: ./Prompt-Engineering-in-Enterprise.drawio.html
 
