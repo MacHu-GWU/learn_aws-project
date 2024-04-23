@@ -6,9 +6,9 @@ from boto_session_manager import BotoSesManager
 
 import aws_cdk as cdk
 import aws_cdk.aws_iam as iam
-import aws_cdk.aws_sns as sns
-import aws_cdk.aws_sns_subscriptions as sns_subscription
+import aws_cdk.aws_sqs as sqs
 import aws_cdk.aws_lambda as lambda_
+import aws_cdk.aws_lambda_event_sources as event_source
 from constructs import Construct
 
 
@@ -33,12 +33,12 @@ class Stack(cdk.Stack):
             ],
         )
 
-        # SNS is declared in the same stack
-        self.sns_topic_name = f"{project_name}-topic"
-        self.sns_topic = sns.Topic(
+        # SQS is declared in the same stack
+        self.sqs_queue_name = f"{project_name}-queue"
+        self.sqs_queue = sqs.Queue(
             self,
-            "SNSTopic",
-            topic_name=self.sns_topic_name,
+            "SQSQueue",
+            queue_name=self.sqs_queue_name,
         )
 
         self.lbd_func_1 = lambda_.Function(
@@ -53,11 +53,14 @@ class Stack(cdk.Stack):
             role=self.iam_role_for_lbd,
         )
 
-        self.sns_topic.add_subscription(
-            sns_subscription.LambdaSubscription(self.lbd_func_1)
+        self.sqs_event_source_1 = event_source.SqsEventSource(
+            queue=self.sqs_queue,
+            batch_size=10,
+            enabled=True,
         )
+        self.lbd_func_1.add_event_source(self.sqs_event_source_1)
 
-        # SNS is declared in another stack
+        # SQS is declared in another stack
         self.lbd_func_2 = lambda_.Function(
             self,
             "LambdaFunction2",
@@ -70,18 +73,23 @@ class Stack(cdk.Stack):
             role=self.iam_role_for_lbd,
         )
 
-        sns_topic = sns.Topic.from_topic_arn(
+        sqs_queue = sqs.Queue.from_queue_arn(
             self,
-            "SNSTopicInterface",
-            topic_arn=f"arn:aws:sns:{cdk.Aws.REGION}:{cdk.Aws.ACCOUNT_ID}:{self.sns_topic_name}",
+            "SQSQueueInterface",
+            queue_arn=f"arn:aws:sqs:{cdk.Aws.REGION}:{cdk.Aws.ACCOUNT_ID}:{self.sqs_queue_name}",
         )
-        sns_topic.add_subscription(sns_subscription.LambdaSubscription(self.lbd_func_2))
+        self.sqs_event_source_2 = event_source.SqsEventSource(
+            queue=sqs_queue,
+            batch_size=10,
+            enabled=True,
+        )
+        self.lbd_func_2.add_event_source(self.sqs_event_source_2)
 
 
 # ------------------------------------------------------------------------------
 # Config
 aws_profile = "bmt_app_dev_us_east_1"
-project_name = "lbd_cdk_event_demo-sns"
+project_name = "lbd_cdk_event_demo-sqs"
 # ------------------------------------------------------------------------------
 
 dir_workspace = Path(__file__).absolute().parent

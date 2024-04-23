@@ -7,6 +7,24 @@ Overview
 ------------------------------------------------------------------------------
 This document provides a comprehensive list of sample AWS CDK code in Python to deploy a Lambda function and configure event mapping for various AWS services.
 
+.. code-block:: bash
+
+    # create virtualenv
+    virtualenv -p python3.10 .venv
+
+    # activate virtualenv
+    source .venv/bin/activate
+
+    # install dependencies
+    pip install -r requirements.txt
+
+    # deploy
+    python cdk_deploy.py
+
+    # delete
+    python cdk_delete.py
+
+
 
 S3 put
 ------------------------------------------------------------------------------
@@ -50,6 +68,12 @@ SQS
        :language: python
        :linenos:
 
+
+.. dropdown:: app.py
+
+    .. literalinclude:: ./sqs/app.py
+       :language: python
+       :linenos:
 
 
 DynamoDB Update
