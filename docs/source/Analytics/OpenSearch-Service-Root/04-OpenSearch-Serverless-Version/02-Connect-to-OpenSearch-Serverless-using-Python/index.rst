@@ -1,11 +1,8 @@
-Amazon OpenSearch Serverless Version
+Connect to OpenSearch Serverless using Python
 ==============================================================================
 Keywords: AWS, Amazon, OpenSearch, OS, OSS, Serverless.
 
-
-Connect to OpenSearch Serverless Collection using Python
-------------------------------------------------------------------------------
-In this section, we introduced two methods that can quickly setup an public accessible (need IAM permission) collection and connect to it using Python.
+We introduced two methods that can quickly setup an public accessible (need IAM permission) collection and connect to it using Python.
 
 **Method 1**
 
