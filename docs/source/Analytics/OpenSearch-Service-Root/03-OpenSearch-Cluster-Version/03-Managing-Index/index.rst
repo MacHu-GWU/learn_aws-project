@@ -41,7 +41,7 @@ OR1 是一个专门为 OpenSearch 设计的 EC2 Instance. 它吸取了 UltraWarm
 
 Index State Management in Amazon OpenSearch Service
 ------------------------------------------------------------------------------
-
+TODO (这个很重要, 以后补)
 
 Summarizing indexes in Amazon OpenSearch Service with index rollup
 ------------------------------------------------------------------------------
