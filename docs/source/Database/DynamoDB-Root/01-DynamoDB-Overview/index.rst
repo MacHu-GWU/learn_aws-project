@@ -2,9 +2,6 @@ Amazon DynamoDB Overview
 ==============================================================================
 Keywords: aws, amazon, dynamodb
 
-Amazon Dynamo
-------------------------------------------------------------------------------
-
 
 How to Learn Amazon DynamoDB
 ------------------------------------------------------------------------------
@@ -24,8 +21,6 @@ DynamoDB 是 NoSQL 数据库中的一种, 也是商业化非常成功的产品�
 - `Amazon Redshift Database Developer Guide <https://docs.aws.amazon.com/redshift/latest/dg/welcome.html>`_: 这个主要是给负责 CRUD 的 data engineer 的文档, 主要介绍了如何创建表, SQL 的功能等跟数据相关的内容. 而关于 Redshift 的维护和管理, 可以参考 Amazon Redshift Management Guide.
 
 我建议直接在你的 AWS Account 里创建一个 Redshift serverless, 然后用 Dbeaver 作为 SQL Client, 用 Python 中的 redshift-connector, psycopg2-binary, sqlalchemy, sqlalchemy-redshift, awswrangler 等库来创建表格, 写入数据, 进行查询等操作来学习.
-
-
 
 
 Amazon DynamoDB Knowledge Graph
