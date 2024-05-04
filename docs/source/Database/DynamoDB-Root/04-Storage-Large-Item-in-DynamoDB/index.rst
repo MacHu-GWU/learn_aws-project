@@ -11,6 +11,7 @@ Keywords: aws, amazon, dynamodb
 
 本文将详细的讨论这种将数据写入到 S3, 将 S3 URI 存到 DynamoDB 中的正确做法.
 
+
 Conclusion
 ------------------------------------------------------------------------------
 - 双写一致性: Create / Update 时先写 S3, 再写 DynamoDB, Delete 时先删 DynamoDB 再删 S3.

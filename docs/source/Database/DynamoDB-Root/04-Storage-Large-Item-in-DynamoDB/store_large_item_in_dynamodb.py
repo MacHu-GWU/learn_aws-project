@@ -165,13 +165,18 @@ try:
             Model.image.set(s3path_image.uri),
         ]
     )
-    print("(optional) Remove old S3 object ...")
-    s3path_existing_html.delete()
-    s3path_existing_image.delete()
+    # note that this may not need. because the new content could be the same
+    # as the old content, so that we should not remove old s3 object
+    # print("(optional) Remove old S3 object ...")
+    # s3path_existing_html.delete()
+    # s3path_existing_image.delete()
 except Exception as e:
-    print("(optional) Remove newly created s3 object if DynamoDB update failed ...")
-    s3path_html.delete()
-    s3path_image.delete()
+    # note that this may not need. because the new content could be the same
+    # as the old content, so that we should not remove old s3 object
+    # print("(optional) Remove newly created s3 object if DynamoDB update failed ...")
+    # s3path_html.delete()
+    # s3path_image.delete()
+    pass
 
 # ------------------------------------------------------------------------------
 # Get item
