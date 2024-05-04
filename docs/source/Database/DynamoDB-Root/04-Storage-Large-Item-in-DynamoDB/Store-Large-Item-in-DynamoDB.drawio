@@ -1,0 +1,161 @@
+<mxfile host="Electron" modified="2024-05-04T19:11:36.921Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="F-7Wt1WjUVrjLTKgATvE" version="23.1.5" type="device" pages="4">
+  <diagram id="G7O2jqpdABzEi2VrVt_c" name="README">
+    <mxGraphModel dx="1012" dy="659" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v1V7xNmCQ-73sL3d13Yb-1" value="&lt;h1&gt;README&lt;/h1&gt;&lt;p&gt;当你要将大量数据作为一个 attribute 存到 DynamoDB 中时, 由于 DynamoDB 有一个 Item 最大 400KB 的限制, 所以官方推荐你将数据写入到 S3 中, 然后将 S3 URI 存到 DynamoDB 中. 这种方法听起来简单, 但是在生产实践中有很多细节问题值得商榷. 例如:&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;写入到 DynamoDB 和 S3 的操作如果有一个失败了怎么处理?&lt;/li&gt;&lt;li&gt;如果 DynamoDB 有多个属性都是这种情况, 这必然导致写入 S3 的耗时会比较长, 如何保证它们全部成功或者全部失败?&lt;/li&gt;&lt;li&gt;写入到 S3 的时候应该怎么构建 S3 URI?&lt;/li&gt;&lt;li&gt;在 Update 的时候是否要删除旧的 S3 Object? 长期下来产生的很多没有用的 S3 Object 怎么清理?&lt;/li&gt;&lt;/ul&gt;&lt;div&gt;本文将详细的讨论这种将数据写入到 S3, 将 S3 URI 存到 DynamoDB 中的正确做法.&lt;/div&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="680" height="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="consistency" id="SBzAipigt8cfWBWiVu9c">
+    <mxGraphModel dx="1012" dy="659" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-1" value="&lt;h1&gt;Consistency&lt;/h1&gt;&lt;p&gt;当你要把很大的 Binary 数据存到 DynamoDB 时, 官方推荐是将数据存在 S3, 然后在 DynamoDB 中只保存 S3 uri. 但是这就存在双写一致性问题. AWS 官方文档&amp;nbsp;&lt;a href=&quot;https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-use-s3-too.html&quot;&gt;Best practices for storing large items and attributes&lt;/a&gt;&amp;nbsp;明确说了 AWS 无法保证 DynamoDB 和 S3 的双写一致性. 所以本文重点讨论如何解决这一问题.&lt;/p&gt;&lt;p&gt;首先我们要讨论的是写 DynamoDB 和 写 S3 操作谁先谁后? 可不可以同时进行?&lt;/p&gt;&lt;p&gt;我认为第一可以排除掉同时写的可能性. 首先因为写 S3 的延迟肯定要远远大于写 DynamoDB, 并行执行的意义不大. 其次因为在 Update 的时候, 除了这些 Binary 的 attribute, 可能还有其他 attribute 需要 Update. 例如 update_at 可以用来反映 DynamoDB item 的修改时间. 逻辑上这个 update_at 必须在 S3 写操作全部完成之后才能写入到 DynamoDB.&lt;/p&gt;&lt;p&gt;然后我们讨论两个写操作谁先谁后. 请看下面的分析.&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="680" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-3" target="-iAJfEY-i9wxDD9hsPfD-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-3" value="成功 / 失败?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="80" y="600" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-4" value="先写 DynamoDB" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="480" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-5" value="再写 S3" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="720" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;entryPerimeter=0;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-6" target="-iAJfEY-i9wxDD9hsPfD-8" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="960" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#b85450;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;fillColor=#f8cecc;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-6" target="-iAJfEY-i9wxDD9hsPfD-16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-6" value="成功 / 失败?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="80" y="840" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-8" value="END" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="100" y="1080" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-9" target="-iAJfEY-i9wxDD9hsPfD-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-9" value="START" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="100" y="400" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-4" target="-iAJfEY-i9wxDD9hsPfD-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-3" target="-iAJfEY-i9wxDD9hsPfD-8" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="480" y="640" />
+              <mxPoint x="480" y="1100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-5" target="-iAJfEY-i9wxDD9hsPfD-6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-16" value="删除 / 更新 DynamoDB" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="280" y="920" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#b85450;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;fillColor=#f8cecc;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-16" target="-iAJfEY-i9wxDD9hsPfD-8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-22" target="-iAJfEY-i9wxDD9hsPfD-24" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-22" value="成功 / 失败?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="80" y="1400" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-23" value="先写 S3" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="1280" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-24" value="再写 DynamoDB" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="80" y="1520" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;entryPerimeter=0;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-27" target="-iAJfEY-i9wxDD9hsPfD-28" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="1760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-27" value="成功 / 失败?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="80" y="1640" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-28" value="END" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="100" y="1880" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-30" target="-iAJfEY-i9wxDD9hsPfD-23" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-30" value="START" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="100" y="1200" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-23" target="-iAJfEY-i9wxDD9hsPfD-22" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-22" target="-iAJfEY-i9wxDD9hsPfD-28" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="1440" />
+              <mxPoint x="440" y="1900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-iAJfEY-i9wxDD9hsPfD-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-24" target="-iAJfEY-i9wxDD9hsPfD-27" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="PLTuGtsQSk9eAzh5gjb9-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#b85450;strokeWidth=2;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;fillColor=#f8cecc;" parent="1" source="-iAJfEY-i9wxDD9hsPfD-27" target="-iAJfEY-i9wxDD9hsPfD-28" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="1680" />
+              <mxPoint x="320" y="1900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="PLTuGtsQSk9eAzh5gjb9-2" value="&lt;h1&gt;先写 S3, 再写 DynamoDB&lt;/h1&gt;&lt;p&gt;这种方式更好. 因为写 S3 的时候可以新建一个 Object, 如果后续写 DynamoDB 的时候出错, 你可以什么都不做, 并且对数据一致性不会有任何影响. 如果写入 S3 失败了就直接失败既可.&amp;nbsp;&lt;/p&gt;你可能需要 catch exception 然后删除掉无用数据, 取决于你是否需要立刻删掉无用数据. 有些项目需要保留历史记录, 有些项目可以过一段时间之后再批量删除无用数据." style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=#82b366;fillColor=#d5e8d4;" parent="1" vertex="1">
+          <mxGeometry x="240" y="1200" width="520" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="jNxu8FSgCU7Bmh4b0KMn-1" value="&lt;h1&gt;先写 DynamoDB, 再写 S3&lt;/h1&gt;&lt;p&gt;这样做不是很好. 因为你写入 DynamoDB 成功后写 S3 的过程可能会失败, 并且这个过程可能会比较长. 在这个期间如果有人来读数据就可能会读到脏数据. 并且如果写 S3 失败, 你需要把 DynamoDB 的数据回滚到之前的状态, 比较复杂且容易出错.&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=#b85450;fillColor=#f8cecc;" parent="1" vertex="1">
+          <mxGeometry x="240" y="400" width="520" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="xcvMTxgEYM_X0KDs7Nud-1" value="&lt;h1&gt;先删 S3, 再删 DynamoDB&lt;/h1&gt;&lt;p&gt;删除的时候稍微有点特殊. 一般先删 DynamoDB 再删 S3. 因为如果你先删 S3 然后删 DynamoDB 失败了, 如果有一个读请求进来就会发现找不到 S3 中的数据, 造成逻辑混乱. 而先删 DynamoDB, 即使删 S3 失败也不要紧, 因为 S3 数据已经用不到了, 以后在批量清除的程序中删除既可.&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=#82b366;fillColor=#d5e8d4;" vertex="1" parent="1">
+          <mxGeometry x="240" y="2000" width="520" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="fjpDu2aaolbvOn1VbCHZ-1" value="&lt;h1&gt;Conclusion&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Create / Update 时先写 S3, 再写 DynamoDB, Delete 时先删 DynamoDB 再删 S3&lt;/span&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" vertex="1" parent="1">
+          <mxGeometry x="80" y="2280" width="680" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="arKxyi4THcbwm6tvvbHB" name="s3-location">
+    <mxGraphModel dx="1012" dy="659" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Q0NRr7hiTEXVWHYvXIGA-1" value="&lt;h1&gt;S3 Location&lt;/h1&gt;&lt;p&gt;把 本应存在 DynamoDB 的数据存到 S3 上的时候选择 S3 location 的策略很多. 常见的有以下几种:&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;b&gt;基于内容&lt;/b&gt;: s3 key 基于内容的 hash. 有利于去除重复避免覆写. 这样做的好处是不存在覆盖掉有用数据的情况. 坏处是删除 S3 上的数据的时候需要检测 object 是否被 DynamoDB 所引用, 这样比较复杂.&lt;/li&gt;&lt;li&gt;&lt;b&gt;基于 pk, sk&lt;/b&gt;: 由于 pk, sk 两着合起来是唯一的, 所以用它们合起来做 s3 key 也是一个不错的选择. 但是要注意你 pk, sk compond key 不能作为最终的 key, 因为这样可能会在双写存在失败的时候覆盖掉正确的数据. 这个 compond key 应该作为一个 prefix 存在.&lt;/li&gt;&lt;/ol&gt;&lt;div&gt;这些策略没有哪个最好, 需要根据具体情况选择.&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;除此之外, 还会存在一些需要慎重决定的问题:&lt;/div&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;由于存在双写一致性问题, 你在写入 S3 的时候不应该覆盖之前的 S3 object, 因为后续操作可能会失败, 可能会造成你的 DynamoDB 没有更新但是原数据丢失了的情况. 所以如果你使用的是 #2, 那么需要对写入策略进行一定的优化.&lt;/li&gt;&lt;li&gt;当 binary 数据发生变化时, 是否需要删除原来的数据也是一个需要考量的因素.&lt;/li&gt;&lt;/ol&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="680" height="360" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ItHKOUdhmgLtOgryVzCq" name="cleanup">
+    <mxGraphModel dx="1124" dy="732" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Vb-7I96BU-UjCANAiuKj-1" value="&lt;h1&gt;Cleanup&lt;/h1&gt;&lt;p&gt;每个 S3 object 都有一个 update at 的 metadata, 这和 DynamoDB item 的时间一致. 所以我们可以用 DynamoDB export 到 S3 (该操作比较便宜, 并不消耗 RCU, 它是用 bin log 实现的. 请看这篇 &lt;a href=&quot;https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html&quot;&gt;DynamoDB data export to Amazon S3: how it works&lt;/a&gt; 官方文档), 然后用一个 batch 程序去对比 DynamoDB 和 S3 既可. 由于 S3 update 的时间可能比真实的 DynamoDB update 时间要早一点 (取决于写入 S3 的耗时), 所以我们可以把时间回溯个 1 小时, 只对比在这之前的数据既可.&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="680" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
