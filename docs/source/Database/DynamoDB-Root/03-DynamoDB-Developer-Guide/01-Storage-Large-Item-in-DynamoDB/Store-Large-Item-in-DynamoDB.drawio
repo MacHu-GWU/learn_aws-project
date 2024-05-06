@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-05-04T19:11:36.921Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="F-7Wt1WjUVrjLTKgATvE" version="23.1.5" type="device" pages="4">
+<mxfile host="Electron" modified="2024-05-04T20:50:09.261Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="tli5LZdCZpEFyHXagSoU" version="23.1.5" type="device" pages="4">
   <diagram id="G7O2jqpdABzEi2VrVt_c" name="README">
     <mxGraphModel dx="1012" dy="659" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -127,10 +127,10 @@
         <mxCell id="jNxu8FSgCU7Bmh4b0KMn-1" value="&lt;h1&gt;先写 DynamoDB, 再写 S3&lt;/h1&gt;&lt;p&gt;这样做不是很好. 因为你写入 DynamoDB 成功后写 S3 的过程可能会失败, 并且这个过程可能会比较长. 在这个期间如果有人来读数据就可能会读到脏数据. 并且如果写 S3 失败, 你需要把 DynamoDB 的数据回滚到之前的状态, 比较复杂且容易出错.&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=#b85450;fillColor=#f8cecc;" parent="1" vertex="1">
           <mxGeometry x="240" y="400" width="520" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="xcvMTxgEYM_X0KDs7Nud-1" value="&lt;h1&gt;先删 S3, 再删 DynamoDB&lt;/h1&gt;&lt;p&gt;删除的时候稍微有点特殊. 一般先删 DynamoDB 再删 S3. 因为如果你先删 S3 然后删 DynamoDB 失败了, 如果有一个读请求进来就会发现找不到 S3 中的数据, 造成逻辑混乱. 而先删 DynamoDB, 即使删 S3 失败也不要紧, 因为 S3 数据已经用不到了, 以后在批量清除的程序中删除既可.&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=#82b366;fillColor=#d5e8d4;" vertex="1" parent="1">
+        <mxCell id="xcvMTxgEYM_X0KDs7Nud-1" value="&lt;h1&gt;先删 S3, 再删 DynamoDB&lt;/h1&gt;&lt;p&gt;删除的时候稍微有点特殊. 一般先删 DynamoDB 再删 S3. 因为如果你先删 S3 然后删 DynamoDB 失败了, 如果有一个读请求进来就会发现找不到 S3 中的数据, 造成逻辑混乱. 而先删 DynamoDB, 即使删 S3 失败也不要紧, 因为 S3 数据已经用不到了, 以后在批量清除的程序中删除既可.&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=#82b366;fillColor=#d5e8d4;" parent="1" vertex="1">
           <mxGeometry x="240" y="2000" width="520" height="200" as="geometry" />
         </mxCell>
-        <mxCell id="fjpDu2aaolbvOn1VbCHZ-1" value="&lt;h1&gt;Conclusion&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Create / Update 时先写 S3, 再写 DynamoDB, Delete 时先删 DynamoDB 再删 S3&lt;/span&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" vertex="1" parent="1">
+        <mxCell id="fjpDu2aaolbvOn1VbCHZ-1" value="&lt;h1&gt;Conclusion&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Create / Update 时先写 S3, 再写 DynamoDB, Delete 时先删 DynamoDB 再删 S3&lt;/span&gt;&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" parent="1" vertex="1">
           <mxGeometry x="80" y="2280" width="680" height="80" as="geometry" />
         </mxCell>
       </root>
@@ -148,11 +148,11 @@
     </mxGraphModel>
   </diagram>
   <diagram id="ItHKOUdhmgLtOgryVzCq" name="cleanup">
-    <mxGraphModel dx="1124" dy="732" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1012" dy="659" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="Vb-7I96BU-UjCANAiuKj-1" value="&lt;h1&gt;Cleanup&lt;/h1&gt;&lt;p&gt;每个 S3 object 都有一个 update at 的 metadata, 这和 DynamoDB item 的时间一致. 所以我们可以用 DynamoDB export 到 S3 (该操作比较便宜, 并不消耗 RCU, 它是用 bin log 实现的. 请看这篇 &lt;a href=&quot;https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html&quot;&gt;DynamoDB data export to Amazon S3: how it works&lt;/a&gt; 官方文档), 然后用一个 batch 程序去对比 DynamoDB 和 S3 既可. 由于 S3 update 的时间可能比真实的 DynamoDB update 时间要早一点 (取决于写入 S3 的耗时), 所以我们可以把时间回溯个 1 小时, 只对比在这之前的数据既可.&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" vertex="1" parent="1">
+        <mxCell id="Vb-7I96BU-UjCANAiuKj-1" value="&lt;h1&gt;Cleanup&lt;/h1&gt;&lt;p&gt;每个 S3 object 都有一个 update at 的 metadata, 这和 DynamoDB item 的时间一致. 所以我们可以用 DynamoDB export 到 S3 (该操作比较便宜, 并不消耗 RCU, 它是用 bin log 实现的. 请看这篇 &lt;a href=&quot;https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html&quot;&gt;DynamoDB data export to Amazon S3: how it works&lt;/a&gt; 官方文档), 然后用一个 batch 程序去对比 DynamoDB 和 S3 既可. 由于 S3 update 的时间可能比真实的 DynamoDB update 时间要早一点 (取决于写入 S3 的耗时), 所以我们可以把时间回溯个 1 小时, 只对比在这之前的数据既可.&lt;br&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" parent="1" vertex="1">
           <mxGeometry x="80" y="80" width="680" height="120" as="geometry" />
         </mxCell>
       </root>

@@ -1,6 +1,6 @@
-Amazon DynamoDB Overview
+DynamoDB Case Study
 ==============================================================================
-Keywords: AWS, Amazon, DynamoDB, Overview.
+Keywords: AWS, Amazon, DynamoDB, Case Study.
 
 .. autotoctree::
     :maxdepth: 1

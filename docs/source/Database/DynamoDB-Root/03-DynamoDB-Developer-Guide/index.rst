@@ -1,6 +1,6 @@
-Amazon DynamoDB Overview
+DynamoDB Developer Guide
 ==============================================================================
-Keywords: AWS, Amazon, DynamoDB, Overview.
+Keywords: AWS, Amazon, DynamoDB, Developer, Guide.
 
 .. autotoctree::
     :maxdepth: 1

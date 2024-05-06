@@ -1,6 +1,6 @@
-Amazon DynamoDB Overview
+DynamoDB Deep Dive
 ==============================================================================
-Keywords: AWS, Amazon, DynamoDB, Overview.
+Keywords: AWS, Amazon, DynamoDB, Deep Dive.
 
 .. autotoctree::
     :maxdepth: 1
