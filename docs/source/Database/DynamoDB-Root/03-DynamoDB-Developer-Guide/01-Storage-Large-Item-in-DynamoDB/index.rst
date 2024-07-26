@@ -1,6 +1,6 @@
 Storage Large Item in DynamoDB
 ==============================================================================
-Keywords: aws, amazon, dynamodb
+Keywords: AWS, Amazon, DynamoDB
 
 很多时候我们会有用 DynamoDB 来管理大型 binary 数据的需求. 例如文档管理系统, Artifacts 管理系统. 而 DynamoDB 有单个 Item 400KB 的限制. 这种情况下, 根据 AWS 官方文档中的 `Best practices for storing large items and attributes <https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-use-s3-too.html>`_ 一文, 你应该将数据存在 S3 上而将 S3 URI 存在 DynamoDB 上. 这种方法听起来简单, 但是在生产实践中有很多细节问题值得商榷. 例如:
 
