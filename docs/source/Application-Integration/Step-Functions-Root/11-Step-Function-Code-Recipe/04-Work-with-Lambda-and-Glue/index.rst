@@ -107,6 +107,6 @@ Step Function 的源码中, 最重要的部分是如何把上一节中的输入�
 
 最终的 Step Function Definition 源码如下:
 
-.. literalinclude::
-   :language: ./definition.json
+.. literalinclude:: ./definition.json
+   :language: javascript
    :linenos:
