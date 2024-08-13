@@ -1,4 +1,4 @@
-Lambda Function Input Output Parameter in AWS StepFunction
+AWS Step Functions - Lambda Function Input Output Parameter
 ==============================================================================
 Keywords: AWS Step Function, StepFunction, SFN, State Machine, StateMachine, Lambda
 

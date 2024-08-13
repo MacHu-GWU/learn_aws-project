@@ -1,4 +1,4 @@
-Work with Lambda and Glue
+AWS Step Functions - Work with Lambda and Glue
 ==============================================================================
 Keywords: AWS Step Function, StepFunction, SFN, State Machine, StateMachine, Lambda, Glue
 

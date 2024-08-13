@@ -1,4 +1,4 @@
-How Step Functions Works
+AWS Step Functions - How Step Functions Works
 ==============================================================================
 Keywords: AWS, Amazon, Step Function, SFN
 

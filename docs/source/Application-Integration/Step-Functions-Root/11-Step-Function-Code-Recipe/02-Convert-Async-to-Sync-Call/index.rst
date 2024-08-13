@@ -1,6 +1,6 @@
 .. _aws-step-function-convert-async-to-sync-call:
 
-Convert Async to Sync Call
+AWS Step Functions - Convert Async to Sync Call
 ==============================================================================
 Keywords: AWS Step Function, StepFunction, SFN, State Machine, StateMachine
 

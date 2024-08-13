@@ -1,6 +1,6 @@
 .. _aws-step-function-wait-for-a-callback-with-the-task-token:
 
-Wait for a Callback with the Task Token
+AWS Step Functions - Wait for a Callback with the Task Token
 ==============================================================================
 
 

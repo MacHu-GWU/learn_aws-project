@@ -1,4 +1,4 @@
-Working with other AWS Services
+AWS Step Functions - Working with other AWS Services
 ==============================================================================
 Keywords: AWS, Amazon, Step Function, SFN
 

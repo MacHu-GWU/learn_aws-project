@@ -1,4 +1,4 @@
-AWS Step Function Poll Job Pattern
+AWS Step Function - Poll Job Pattern
 ==============================================================================
 Keywords: AWS Step Function, StepFunction, SFN, State Machine, StateMachine, Root, Patterns, Poll Job, Async
 
