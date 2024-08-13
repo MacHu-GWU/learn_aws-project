@@ -37,18 +37,24 @@ Overview:
 
 ``sfn_pattern_job_poll_1_run_job.py``:
 
-.. literalinclude:: ./sfn_pattern_job_poll_1_run_job.py
-   :language: python
+.. dropdown:: sfn_pattern_job_poll_1_run_job.json
+
+    .. literalinclude:: ./sfn_pattern_job_poll_1_run_job.py
+       :language: python
 
 ``sfn_pattern_job_poll_2_check_status.py``:
 
-.. literalinclude:: ./sfn_pattern_job_poll_2_check_status.py
-   :language: python
+.. dropdown:: sfn_pattern_job_poll_2_check_status.json
+
+    .. literalinclude:: ./sfn_pattern_job_poll_2_check_status.py
+       :language: python
 
 ``sfn_pattern_job_poll_definition.json``:
 
-.. literalinclude:: ./sfn_pattern_job_poll_definition.json
-   :language: json
+.. dropdown:: sfn_pattern_job_poll_definition.json
+
+    .. literalinclude:: ./sfn_pattern_job_poll_definition.json
+       :language: json
 
 
 Use AWS SDK Integration for Job Poller
