@@ -1,0 +1,50 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Start Job",
+  "States": {
+    "Start Job": {
+      "Comment": "Placeholder for a task state which starts a job. Replace with an API action.",
+      "Type": "Pass",
+      "Next": "DescribeExport"
+    },
+    "DescribeExport": {
+      "Type": "Task",
+      "Parameters": {
+        "ExportArn.$": "$.ExportDescription.ExportArn"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:describeExport",
+      "Next": "Job Complete?"
+    },
+    "Job Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.ExportDescription.ExportStatus",
+          "StringEquals": "FAILED",
+          "Next": "Job Failed"
+        },
+        {
+          "Variable": "$.ExportDescription.ExportStatus",
+          "StringEquals": "COMPLETED",
+          "Next": "Job Succeeded"
+        }
+      ],
+      "Default": "Wait"
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 10,
+      "Next": "DescribeExport"
+    },
+    "Job Succeeded": {
+      "Comment": "Placeholder for a state which handles the success.",
+      "Type": "Pass",
+      "End": true
+    },
+    "Job Failed": {
+      "Comment": "Placeholder for a state which handles the failure.",
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}

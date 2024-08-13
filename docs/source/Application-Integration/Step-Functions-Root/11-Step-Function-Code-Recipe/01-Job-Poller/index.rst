@@ -1,4 +1,4 @@
-AWS Step Function - Poll Job Pattern
+AWS Step Function - Job Poller Pattern
 ==============================================================================
 Keywords: AWS Step Function, StepFunction, SFN, State Machine, StateMachine, Root, Patterns, Poll Job, Async
 
@@ -45,7 +45,61 @@ Overview:
 .. literalinclude:: ./sfn_pattern_job_poll_2_check_status.py
    :language: python
 
-``definition.json``:
+``sfn_pattern_job_poll_definition.json``:
 
-.. literalinclude:: ./definition.json
+.. literalinclude:: ./sfn_pattern_job_poll_definition.json
    :language: json
+
+
+Use AWS SDK Integration for Job Poller
+------------------------------------------------------------------------------
+在上面这个例子中, 无论是 Job Runner, 还是 Check Status, 还是 If else Choice 都是用 Lambda Function 实现的. 也就是说我们在 Lambda Function 里面的代码中用 boto3 去调 AWS API. 这样做的好处是一是比较灵活, 二是可以查文档的输入输出, 控制的更加精确. 坏处就是你需要多维护几个 Lambda Function.
+
+你在 Step Function 的 design studio 里会看到左边有很多可以 drag and drop 的图标, 这些图标就是 AWS SDK 中的 API 的 caller, 也叫做 AWS SDK Integration. 你用这些图标可以无需使用 Lambda Function, 直接调 API, 减少了运维的复杂度, 也减少了开支 (这个功能不收钱). 但是官放文档称这些图标的输入输出是跟 AWS SDK 一样的, 但是对于开发者来说, 这种说明非常不透明, 经常会有需要猜测的地方.
+
+这里我们用 DynamoDB Export Table 为例, 全部使用 AWS SDK Integration 来实现一次 Job Poller 的模式.
+
+下图是我们的 Step Function:
+
+.. image:: ./dynamodb_export_sfn_def.png
+
+下面是 SFN 的 definition:
+
+.. dropdown:: dynamodb_export_sfn_def.json
+
+    .. literalinclude:: ./dynamodb_export_sfn_def.json
+       :language: javascript
+       :linenos:
+
+这里最关键的是 DynamoDB Describe Export 这一步里的 ``"ExportArn.$": "$.ExportDescription.ExportArn"``::
+
+    "DescribeExport": {
+      "Type": "Task",
+      "Parameters": {
+        "ExportArn.$": "$.ExportDescription.ExportArn"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:dynamodb:describeExport",
+      "Next": "Job Complete?"
+    },
+
+根据 API 文档 `describe_export <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb/client/describe_export.html>`_, 这个 API 返回值是这样的::
+
+    {
+        "ExportDescription": {
+            "ExportArn": ...,
+            "ExportStatus": ...,
+            ...,
+        }
+    }
+
+这个值会在 Choice 这一步中用 ``"Variable": "$.ExportDescription.ExportStatus",`` 进行判断. 如果还在 in progress, 则这个 describe_export API 的返回值会被一直 pass through 到 Wait 这一步, 然后又会返回给 ``DescribeExport`` 这一步. 所以等于是 ``DescribeExport`` 在第一次的时候要从别的地方拿数据作为 input, 而 wait 之后则是用自己的返回值作为 input. 所以你的 ``DescribeExport`` 的这一步 ``"Parameters": {"ExportArn.$": "$.ExportDescription.ExportArn"}`` 的逻辑必须是从这个 API 的返回值拿 Input. 而 ``DescribeExport`` 的前一步就需要将输出整理成跟 API 的返回值类似的格式.
+
+在我们的测试代码 ``dynamodb_export_sfn_test.py`` 中, 我们整个 Step Function 的 Input 就是 ``{"ExportDescription": {"ExportArn": ...}}``, 它被一直 pass through 给了 ``DescribeExport``. 当然你的 Input 可以是任何结构, 你只要在 ``DescribeExport`` 的前一步的 OutputPath Selector, 或者 ``DescribeExport`` 本身的 InputPath Selector 将其整理成这个格式既可.
+
+.. dropdown:: dynamodb_export_sfn_test.py
+
+    .. literalinclude:: ./dynamodb_export_sfn_test.py
+       :language: python
+       :linenos:
+
+总结下来, 你要用 AWS SDK Integratin 来实现 Job Poller, 你最重要的是阅读那个 Get Status 的 API, 例如 `EC2.describe_instances <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2/client/describe_instances.html>`_, 看看它的返回值的 status 在哪里, 以及他本身的 resource identifier 在哪里, 然后你的 Get Status 这一步的 Input 就是用返回值反过来构造自己的输入参数. 然后你前面的步骤都适应这个构造语法既可.
