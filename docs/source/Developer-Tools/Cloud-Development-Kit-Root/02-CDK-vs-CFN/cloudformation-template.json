@@ -1,0 +1,27 @@
+{
+    "Parameters": {
+        "ParamProjectName": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "IamGroup": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": {
+                    "Fn::Sub": [
+                        "${ParamProjectName}-${AwsRegion}-group",
+                        {
+                            "ParamProjectName": {
+                                "Ref": "ParamProjectName"
+                            },
+                            "AwsRegion": {
+                                "Ref": "AWS::Region"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
