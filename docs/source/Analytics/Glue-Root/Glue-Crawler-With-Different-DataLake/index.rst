@@ -72,7 +72,7 @@ DeltaLake 社区有一个非常好用的 Python 库 `delta-rs <https://github.co
 
 .. dropdown:: delta_example_has_partition_manual_create_table.py
 
-    .. literalinclude:: ./delta_issue/delta_example_has_partition_manual_create_table.py
+    .. literalinclude:: ./delta_example_has_partition_manual_create_table.py
        :language: python
        :emphasize-lines: 1-1
        :linenos:
