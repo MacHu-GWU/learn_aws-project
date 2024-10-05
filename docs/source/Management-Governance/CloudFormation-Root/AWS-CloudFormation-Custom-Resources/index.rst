@@ -1,3 +1,5 @@
+.. _aws-cloudformation-custom-resources:
+
 AWS CloudFormation Custom Resources
 ==============================================================================
 Keywords: AWS, Amazon, CloudFormation
@@ -29,6 +31,8 @@ What is AWS CloudFormation Customer Resources
 5. 将服务器镜像部署到 AWS.
 
 
+.. _cloudformation-custom-resource-request-object:
+
 Request Object
 ------------------------------------------------------------------------------
 下面是 CloudFormation 发送给 Custom Resource 的 Request JSON body. 如果是 Lambda Backed Resource, 以 Python 为例, 那么 ``def lambda_handler(event, context):`` 中的 event 的内容就是这个. 关于里面的每个字段的解释可以看 这篇官方文档 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-requests.html. 其中 ``ResponseURL`` 是你需要将结果发送到的 URL. 而 ``ResourceProperties`` 则是你的 CloudFormation 中定义的 Custom Resource
@@ -44,6 +48,10 @@ Request Object
             "Key2": "Value2"
         }
     },
+
+.. note::
+
+    如果你用 CDK 定义 CloudFormation, 请使用 `aws_cdk.CustomResource <https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk/CustomResource.html>`_ 这个 Construct. 经过我的测试, 这个最好用.
 
 下面是一个 Request Object 的例子.
 
@@ -61,6 +69,8 @@ Request Object
             "Key2": "Value2"
        }
     }
+
+可以看到, 这个 Request 中的 RequestType 是 Create, 因为这个例子是出自于第一次创建 CloudFormation 的时候. 除了 Create 之外, 还有 Update 和 Delete 两种, 分别对应 Update 和 Delete 这个 Resource 时的情况. 注意, 对应的是 Update 和 Delete 这个 Resource 的情况, 而不是 Update 和 Delete 这个 CloudFormation 的情况, 不要混淆了. 更多关于 Create / Update / Delete 的细节可以看后面的 :ref:`custom-resource-lifecycle-in-cloudFormation` 一节.
 
 
 Response Object
@@ -123,7 +133,25 @@ Response Object
        }
     }
 
-可以看出 Response Object 中的 ``Data`` 字段包含了 ami_id 的信息. 然后里面的 key 都变成了 ``GetEC2AmiId`` 这个 Custom Resource 的 Attribute, 所以你在后续创建 EC2 的 ``MyEC2Instance`` 中就可以用 ``{"Fn::GetAtt": ["GetEC2AmiId", "ami_id"]}`` 来获取 AMI ID 了
+**Data 字段**
+
+可以看出 Response Object 中的 ``Data`` 字段包含了 ami_id 的信息. 然后里面的 key 都变成了 ``GetEC2AmiId`` 这个 Custom Resource 的 Attribute, 所以你在后续创建 EC2 的 ``MyEC2Instance`` 中就可以用 ``{"Fn::GetAtt": ["GetEC2AmiId", "ami_id"]}`` 来获取 AMI ID 了.
+
+**Status 字段**
+
+此外, Status 字段也很重要, 这个字段你只能发送 ``SUCCESS`` 和 ``FAILED`` 两个值. 如果你发送了 ``SUCCESS``, 那么 CloudFormation 就会继续部署后续的 Resource, 如果你发送了 ``FAILED``, 那么 CloudFormation 就会停止后续的部署并立即失败. 如果你的 ServiceToken 对应的 LambdaFunction 本身由于代码的 bug 导致直接异常, 压根没有发送信号, 那么 CloudFormation 就会等一个小时才会失败. 这个一个小时是一个可以控制的变量, 你可以在 Custom Resource ``Properties`` 中定义一个 ``ServiceTimeout`` 属性, 然后设一个整数 (单位秒), 那么它就只会等待这个数而不是一个小时.
+
+**PhysicalResourceId 字段**
+
+PhysicalResourceId 也是一个比较不容易理解的字段. 建议先了解 CloudFormation 中的 Resource 的 Logical Id 和 `Physical Id <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html#resources-section-physical-id>`_ 的概念.
+
+现在我们来看一个例子:
+
+1. 你第一次创建 CloudFormation Stack 时, 创建了这个 Custom Resource, 期间发送了一次 Request, 收到了一次 Response, 而这个 Response 中就会有 PhysicalResourceId 字段 (不能为 None), 并把这个字段设为这个 Custom Resource 的 Physical Id.
+2. 然后你 Update Stack, 这个 Custom Resource 的一个 Property 的值发生了改变, 于是又发送了 Request 和收到了 Response.
+    - 如果这次的 PhysicalResourceId 跟之前的一样, 那么 CloudFormation 就会 Update 这个 Resource. 这次 Update Stack 的过程中总共发送了 1 个 Request.
+    - 而如果 PhysicalResourceId 不一样, 那么 CloudFormation 会先 Update, 然后 assign 一个新的 PhysicalResourceId, 然后再删除之前的旧的 Custom Resource, 那么这个过程中又多发送了一个 Delete. 所以整个过程中发送了 2 个 Request (先 Update 再删除).
+3. 而 Delete Stack 的时候不管 PhysicalResourceId 跟之前的一不一样, 都只会发送 1 个 Request, 然后删掉这个 Custom Resource.
 
 
 Customer Resource Call Lambda Function in Another Account
@@ -133,9 +161,7 @@ Customer Resource Call Lambda Function in Another Account
 1. 你的 Lambda Function 和 CloudFormation 所在的 Region 必须相同.
 2. 你的 Lambda Function 需要定义 Resource Based Policy 定义了允许客户的 AWS Account 跟它通信.
 
-详情请参考 `How can I use a Lambda function created in one AWS account with an AWS CloudFormation custom resource in another AWS account? <https://repost.aws/knowledge-center/cloudformation-lambda-custom-resource>`_ 这篇 Repost
-一般你会将 Lambda Function
-R
+详情请参考 `How can I use a Lambda function created in one AWS account with an AWS CloudFormation custom resource in another AWS account? <https://repost.aws/knowledge-center/cloudformation-lambda-custom-resource>`_ 这篇 Repost.
 
 
 Custom Resources 软件交付场景中的应用
@@ -168,3 +194,39 @@ Automation Script to Deploy CloudFormation
 .. literalinclude:: ./deploy_cf.py
    :language: python
    :linenos:
+
+
+Advanced Topics
+------------------------------------------------------------------------------
+从本节开始, 我将介绍跟 Custom Resource 相关的一些高级话题.
+
+
+.. _custom-resource-lifecycle-in-cloudFormation:
+
+Custom Resource LifeCycle in CloudFormation
+------------------------------------------------------------------------------
+Custom Resource 跟其他 CloudFormation Resource 一样, 就是一个普通的资源. 在前面 :ref:`cloudformation-custom-resource-request-object` 一节说了, 这个 Resource 会向后端系统发起一个 Request. 而这个 RequestType 的值可能是 Create, Update, Delete 中的一个, 分别对应了这个 Custom Resource 的 Create, Update, Delete 事件. 它跟其他 CloudFormation Resource 一样, 你第一次创建 CloudFormation 时 event 自然是 Create, 而你后续 Update CloudFormation Stack 时, 如果它的属性没有变化, 那么它就不会 Update, 也自然压根不会发送 Request. 而如果它的 Property 发生了改变, 那么自然就会触发 Update event 并发送 Request, 如果你 Delete CloudFormation Stack 时, 或者 Update Stack 时在 CloudFormation 中删掉了这个 Resource 的定义, 那么就会触发 Delete.
+
+.. code-block:: javascript
+
+    {
+        "Type": "Custom::ResourceName",
+        "Properties": {
+            "ServiceToken": "arn:aws:lambda:us-east-1:111122223333:function:lbd_func_name",
+            "Key1": "Value1",
+            "Key2": "Value2"
+        }
+    },
+
+根据以上原理, 如果你想要实现每次更新 Stack 的时候都会发送 Request, 那么你要在 Properties 中设一个属性, 然后这个属性的值要 Reference 一个 Parameter, 然后你 Update 的时候每次都要随机生成一个这个 Parameter 的值. 我一般叫这个 Parameter 为 ``MyCustomResourceClientToken``.
+
+
+How to Implement a Lambda Backed Custom Resource
+------------------------------------------------------------------------------
+前面介绍了, Custom Resource 会发送一个 Request 给 Service Token 中定义的 Lambda Function (如果你用的是 Lambda Function 的话). 如果你的 Lambda Function 代码有问题, 那么很可能会出现 Lambda Function 自己出错, 而没有成功发送 Response 回来, 导致部署失败, 以及 CloudFormation 卡住. 所以这个 Lambda Function 非常重要.
+
+
+More Example
+------------------------------------------------------------------------------
+.. autotoctree::
+    :maxdepth: 1
