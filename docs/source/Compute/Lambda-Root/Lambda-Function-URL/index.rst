@@ -44,9 +44,13 @@ Lambda Function URL Use Case
 2. 你的 URL Endpoint 是保密的, 仅仅用于你的内部网站拉取资源用. 注意, 你无法用前端技术完全保护你的 URL 不被泄露, 因为最终抓包一定能抓到这个 URL.
 3. 你的内部用户不懂 AWS SDK, 只会用 HTTP Client (我个人不太确定真的有没有人这样做, 学一下 AWS SDK 也不难啊), 在里面填写 AWS Credential 签名并发起 HTTP 请求.
 
+另外我重点说一下 Public Lambda Function Url 和 API Gateway 在使用上的区别. 很多人会用 API Gateway + Lambda Function 作为 Rest API 的后端, 鉴权一般由 API Gateway Authorizer 完成, 并且这个鉴权是缓存的. 如果你把 Public Lambda Function Url 当 Rest API 用, 并且你又想要使用一定的 Auth 机制, 那么你就要在你的代码中实现 Auth 机制, 比如到数据库中查表看看 username password 合不合法. 由于 Lambda Function Url 不自带 Cache, 所以你需要自己实现 Cache 机制, 不然黑客对你的 URL 发起大量请求, 你的数据库会分分钟被流量打爆.
+
 
 Example 1
 ------------------------------------------------------------------------------
+HTTP GET, 无 Auth.
+
 .. dropdown:: lambda_function_1.py
 
     .. literalinclude:: ./lambda_function_1.py
@@ -119,6 +123,8 @@ Received Event:
 
 Example 2
 ------------------------------------------------------------------------------
+HTTP POST, 无 Auth.
+
 .. dropdown:: lambda_function_2.py
 
     .. literalinclude:: ./lambda_function_2.py
@@ -191,6 +197,8 @@ Received Event:
 
 Example 3
 ------------------------------------------------------------------------------
+HTTP GET, 有 Auth.
+
 .. dropdown:: lambda_function_3.py
 
     .. literalinclude:: ./lambda_function_3.py
@@ -276,6 +284,8 @@ Received Event:
 
 Example 4
 ------------------------------------------------------------------------------
+HTTP POST, 有 Auth.
+
 .. dropdown:: lambda_function_4.py
 
     .. literalinclude:: ./lambda_function_4.py

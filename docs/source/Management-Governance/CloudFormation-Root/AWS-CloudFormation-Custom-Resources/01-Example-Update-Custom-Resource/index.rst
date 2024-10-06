@@ -1,4 +1,4 @@
-01 Example Update Custom Resource
+CloudFormation Custom Resource - 01 Example Update Custom Resource
 ==============================================================================
 Keywords: AWS, Amazon, CloudFormation
 
