@@ -30,6 +30,10 @@ Permission Boundary How it Works Explained
 
 在这种设置下，用户在创建 role 时，如果没有将指定的 Permission Boundary 绑定到新创建的 role 上，就无法成功创建该 role，自然也无法 assume 它. 因此，关键在于，若要限制某个 IAM Principal 的权限范围，需要通过 Permission Boundary 强制其在创建新的 role 时附加特定的 Permission Boundary，从而防止权限提升. 这是实现安全控制的核心.
 
+注意事项:
+
+- 在使用 Permission Boundary 时候一定不能给 ``iam:DeleteRolePermissionsBoundary`` 这个权限, 不然用户可以创建后删除 Permission Boundary, 这个机制就形同虚设了.
+
 
 Permission Boundary Example
 ------------------------------------------------------------------------------

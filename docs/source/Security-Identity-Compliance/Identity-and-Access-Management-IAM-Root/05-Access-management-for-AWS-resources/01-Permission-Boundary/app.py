@@ -56,7 +56,7 @@ class Stack(cdk.Stack):
                 "iam:DeletePolicy",
                 "iam:DeletePolicyVersion",
                 "iam:DeleteRole",
-                "iam:DeleteRolePermissionsBoundary",
+                # "iam:DeleteRolePermissionsBoundary", # 一定不能给这个权限, 不然用户可以创建后删除 Permission Boundary, 这个机制就形同虚设了
                 "iam:DeleteRolePolicy",
                 "iam:DetachRolePolicy",
                 "iam:EnableMFADevice",
@@ -114,6 +114,7 @@ class Stack(cdk.Stack):
                 "iam:ListVirtualMFADevices",
                 "iam:PassRole",
                 "iam:PutRolePermissionsBoundary",
+                "iam:PutRolePolicy",
                 "iam:SimulateCustomPolicy",
                 "iam:SimulatePrincipalPolicy",
                 "iam:TagInstanceProfile",
@@ -134,7 +135,6 @@ class Stack(cdk.Stack):
             effect=iam.Effect.ALLOW,
             actions=[
                 "iam:CreateRole",
-                "iam:PutRolePolicy",
             ],
             resources=[f"arn:aws:iam::{cdk.Aws.ACCOUNT_ID}:role/*"],
             conditions={
