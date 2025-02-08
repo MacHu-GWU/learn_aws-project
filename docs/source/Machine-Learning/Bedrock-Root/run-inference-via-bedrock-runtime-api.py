@@ -23,7 +23,7 @@ res = bd.invoke_model(
     body=json.dumps(body),
     accept="application/json",
     contentType="application/json",
-    modelId="arn:aws:bedrock:us-east-1:510022808362:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0",
+    modelId="arn:aws:bedrock:us-east-1:111122223333:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0",
 )
 rprint(json.loads(res["body"].read().decode("utf-8")))
 """
