@@ -83,6 +83,15 @@ OpenSearch Knowledge Graph
     - Query DSL
 
 
+AWS OpenSearch Release Key Milestone
+------------------------------------------------------------------------------
+- 2021-07: AWS OpenSearch Service 发布
+- 2023-01: AWS OpenSearch Serverless 发布
+- 2023-04: AWS OpenSearch Ingestion 发布
+- 2023-11: AWS OpenSearch Zero ETL 发布
+- 2023-11: AWS OpenSearch Vector Store 发布
+
+
 What's Next
 ------------------------------------------------------------------------------
 todo

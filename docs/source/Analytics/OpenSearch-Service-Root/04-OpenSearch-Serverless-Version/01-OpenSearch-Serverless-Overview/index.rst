@@ -75,3 +75,11 @@ Reference:
 
 - `Managing capacity limits for Amazon OpenSearch Serverless <https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-scaling.html>`_
 - `boto3 opensearchserverless client update_account_settings <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/opensearchserverless/client/update_account_settings.html>`_
+
+
+5. Limitation
+------------------------------------------------------------------------------
+由于 Serverless 底层设计的原因, 特别是为了存算分离, 自动管理 Shard, Replica, Node 的特性, 有一些 ElasticSearch 和 OpenSearch 原生支持的功能暂时不支持. 例如 update_by_query, delete_by_query, scroll (分页获取大量数据) 这些操作都不支持. 所以 Serverless 本质上更适合与纯分析, Append Only 没有 Delete 的场景.
+
+- `Supported operations in Amazon OpenSearch Service <https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html>`_
+- `Supported operations and plugins in Amazon OpenSearch Serverless <https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-genref.html>`_
