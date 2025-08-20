@@ -1,17 +1,17 @@
-<mxfile host="Electron" modified="2024-06-07T16:14:20.843Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="hsvgaGPTXTHwjNzNm3CQ" version="23.1.5" type="device" pages="8">
+<mxfile host="Electron" modified="2024-07-16T17:29:13.307Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/23.1.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="AevoB5q4cnQhfzeRBaDk" version="23.1.5" type="device" pages="7">
   <diagram id="lteP5mjpo1mBcX1ssId2" name="README">
     <mxGraphModel dx="963" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="YTZ3fkL_BMMDC9yC34iU-2" value="&lt;h1&gt;README&lt;/h1&gt;&lt;div&gt;This document presents an architectural design I developed for ML model monitoring system.&lt;br&gt;&lt;/div&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" vertex="1" parent="1">
+        <mxCell id="YTZ3fkL_BMMDC9yC34iU-2" value="&lt;h1&gt;README&lt;/h1&gt;&lt;div&gt;This document presents an architectural design I developed for ML model monitoring system.&lt;br&gt;&lt;/div&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;strokeColor=default;" parent="1" vertex="1">
           <mxGeometry x="80" y="80" width="640" height="160" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram name="High-Level" id="yK_CMrWPzDjN4usBkAyE">
-    <mxGraphModel dx="2140" dy="1620" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1751" dy="1325" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -178,7 +178,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="8ofUkTf2HRap0pkAUCSW" name="Measurement">
-    <mxGraphModel dx="1605" dy="1215" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="963" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -363,7 +363,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="2MRDt9njuiGJrjLgbMov" name="Raw Data">
-    <mxGraphModel dx="1926" dy="1458" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="963" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -939,14 +939,6 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="4Vfw8e20V3wIeY6n7qcL" name="Curated Data">
-    <mxGraphModel dx="963" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-      </root>
-    </mxGraphModel>
-  </diagram>
   <diagram id="JzjA86tJRYaDng4mRGj7" name="Event Detection">
     <mxGraphModel dx="963" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -1027,7 +1019,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="Raw-Data" id="bIUL-ED7704E-atrYb0i">
-    <mxGraphModel dx="1605" dy="1215" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="963" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
